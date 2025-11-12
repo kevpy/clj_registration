@@ -6,7 +6,7 @@ import { toast } from "sonner";
 export function EventRegistration() {
   const events = useQuery(api.events.getAllEvents, { includeInactive: false });
   const registerAtDoor = useMutation(api.registrations.registerAttendeeAtDoor);
-  
+
   const [selectedEventId, setSelectedEventId] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
   const [formData, setFormData] = useState({
@@ -21,21 +21,23 @@ export function EventRegistration() {
 
   const searchResults = useQuery(
     api.registrations.searchAttendees,
-    searchTerm.length >= 2 ? { searchTerm, limit: 5 } : "skip"
+    searchTerm.length >= 2 ? { searchTerm, limit: 5 } : "skip",
   );
-  
+
   const existingAttendee = useQuery(
     api.registrations.getAttendeeByPhone,
-    formData.phoneNumber.length >= 10 ? { phoneNumber: formData.phoneNumber } : "skip"
+    formData.phoneNumber.length >= 10
+      ? { phoneNumber: formData.phoneNumber }
+      : "skip",
   );
 
   const eventRegistrations = useQuery(
     api.registrations.getEventRegistrations,
-    selectedEventId ? { eventId: selectedEventId as any } : "skip"
+    selectedEventId ? { eventId: selectedEventId as any } : "skip",
   );
 
   const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleAttendeeSelect = (attendee: any) => {
@@ -52,13 +54,18 @@ export function EventRegistration() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!selectedEventId) {
       toast.error("Please select an event");
       return;
     }
 
-    if (!formData.name || !formData.placeOfResidence || !formData.phoneNumber || !formData.gender) {
+    if (
+      !formData.name ||
+      !formData.placeOfResidence ||
+      !formData.phoneNumber ||
+      !formData.gender
+    ) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -71,14 +78,14 @@ export function EventRegistration() {
           name: formData.name,
           placeOfResidence: formData.placeOfResidence,
           phoneNumber: formData.phoneNumber,
-          gender: formData.gender as "male" | "female" | "other",
+          gender: formData.gender as "male" | "female",
           email: formData.email || undefined,
         },
         isFirstTimeGuest: formData.isFirstTimeGuest,
         useExistingAttendee: !!existingAttendee,
         existingAttendeeId: existingAttendee?._id,
       });
-      
+
       toast.success("Attendee registered and checked in successfully!");
       setFormData({
         name: "",
@@ -90,7 +97,9 @@ export function EventRegistration() {
       });
       setSearchTerm("");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Registration failed");
+      toast.error(
+        error instanceof Error ? error.message : "Registration failed",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -107,13 +116,17 @@ export function EventRegistration() {
     );
   }
 
-  const selectedEvent = events.find(e => e._id === selectedEventId);
+  const selectedEvent = events.find((e) => e._id === selectedEventId);
 
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Door Registration & Check-in</h2>
-        <p className="text-gray-600">Register attendees as they arrive at the event</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+          Door Registration & Check-in
+        </h2>
+        <p className="text-gray-600 text-sm sm:text-base">
+          Register attendees as they arrive at the event
+        </p>
       </div>
 
       {/* Event Selection */}
@@ -132,11 +145,12 @@ export function EventRegistration() {
             <option key={event._id} value={event._id}>
               {event.name} - {new Date(event.date).toLocaleDateString()}
               {event.startTime && ` at ${event.startTime}`}
-              {event.maxCapacity && ` (${event.attendedCount}/${event.maxCapacity} attended)`}
+              {event.maxCapacity &&
+                ` (${event.attendedCount}/${event.maxCapacity} attended)`}
             </option>
           ))}
         </select>
-        
+
         {selectedEvent && (
           <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <h4 className="font-medium text-blue-900">{selectedEvent.name}</h4>
@@ -146,12 +160,18 @@ export function EventRegistration() {
               {selectedEvent.location && ` • ${selectedEvent.location}`}
             </p>
             {selectedEvent.description && (
-              <p className="text-sm text-blue-600 mt-1">{selectedEvent.description}</p>
+              <p className="text-sm text-blue-600 mt-1">
+                {selectedEvent.description}
+              </p>
             )}
             <div className="flex gap-4 mt-2 text-sm">
-              <span className="text-green-600">✅ {selectedEvent.attendedCount} checked in</span>
+              <span className="text-green-600">
+                ✅ {selectedEvent.attendedCount} checked in
+              </span>
               {selectedEvent.maxCapacity && (
-                <span className="text-gray-600">👥 Capacity: {selectedEvent.maxCapacity}</span>
+                <span className="text-gray-600">
+                  👥 Capacity: {selectedEvent.maxCapacity}
+                </span>
               )}
             </div>
           </div>
@@ -172,7 +192,7 @@ export function EventRegistration() {
               placeholder="Type name to search..."
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-            
+
             {searchResults && searchResults.length > 0 && (
               <div className="mt-2 bg-white border border-gray-200 rounded-lg shadow-sm">
                 {searchResults.map((attendee) => (
@@ -181,15 +201,19 @@ export function EventRegistration() {
                     onClick={() => handleAttendeeSelect(attendee)}
                     className="w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
                   >
-                    <div className="font-medium text-gray-900">{attendee.name}</div>
+                    <div className="font-medium text-gray-900">
+                      {attendee.name}
+                    </div>
                     <div className="text-sm text-gray-500">
                       {attendee.placeOfResidence} • {attendee.phoneNumber}
-                      <span className={`ml-2 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${
-                        attendee.isFirstTimeGuest 
-                          ? 'bg-orange-100 text-orange-800' 
-                          : 'bg-green-100 text-green-800'
-                      }`}>
-                        {attendee.isFirstTimeGuest ? 'First-time' : 'Returning'}
+                      <span
+                        className={`ml-2 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${
+                          attendee.isFirstTimeGuest
+                            ? "bg-orange-100 text-orange-800"
+                            : "bg-green-100 text-green-800"
+                        }`}
+                      >
+                        {attendee.isFirstTimeGuest ? "First-time" : "Returning"}
                       </span>
                     </div>
                   </button>
@@ -221,7 +245,9 @@ export function EventRegistration() {
                 <input
                   type="text"
                   value={formData.placeOfResidence}
-                  onChange={(e) => handleInputChange("placeOfResidence", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("placeOfResidence", e.target.value)
+                  }
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
@@ -234,21 +260,29 @@ export function EventRegistration() {
                 <input
                   type="tel"
                   value={formData.phoneNumber}
-                  onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("phoneNumber", e.target.value)
+                  }
                   className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    existingAttendee ? 'border-green-300 bg-green-50' : 'border-gray-300'
+                    existingAttendee
+                      ? "border-green-300 bg-green-50"
+                      : "border-gray-300"
                   }`}
                   required
                 />
                 {existingAttendee && (
                   <p className="mt-1 text-sm text-green-600">
                     ✓ Found existing attendee: {existingAttendee.name}
-                    <span className={`ml-2 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${
-                      existingAttendee.isFirstTimeGuest 
-                        ? 'bg-orange-100 text-orange-800' 
-                        : 'bg-green-100 text-green-800'
-                    }`}>
-                      {existingAttendee.isFirstTimeGuest ? 'First-time' : 'Returning'}
+                    <span
+                      className={`ml-2 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${
+                        existingAttendee.isFirstTimeGuest
+                          ? "bg-orange-100 text-orange-800"
+                          : "bg-green-100 text-green-800"
+                      }`}
+                    >
+                      {existingAttendee.isFirstTimeGuest
+                        ? "First-time"
+                        : "Returning"}
                     </span>
                   </p>
                 )}
@@ -267,7 +301,6 @@ export function EventRegistration() {
                   <option value="">Select Gender</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
-                  <option value="other">Other</option>
                 </select>
               </div>
 
@@ -289,10 +322,15 @@ export function EventRegistration() {
                 type="checkbox"
                 id="firstTimeGuest"
                 checked={formData.isFirstTimeGuest}
-                onChange={(e) => handleInputChange("isFirstTimeGuest", e.target.checked)}
+                onChange={(e) =>
+                  handleInputChange("isFirstTimeGuest", e.target.checked)
+                }
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <label htmlFor="firstTimeGuest" className="ml-2 block text-sm text-gray-900">
+              <label
+                htmlFor="firstTimeGuest"
+                className="ml-2 block text-sm text-gray-900"
+              >
                 First-time guest (has never attended any event before)
               </label>
             </div>
@@ -314,19 +352,31 @@ export function EventRegistration() {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Event Attendees ({eventRegistrations.length})
               </h3>
-              
+
               {eventRegistrations.length === 0 ? (
-                <p className="text-gray-500 text-center py-4">No attendees checked in yet</p>
+                <p className="text-gray-500 text-center py-4">
+                  No attendees checked in yet
+                </p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Check-in Time</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                          Name
+                        </th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                          Phone
+                        </th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                          Location
+                        </th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                          Status
+                        </th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                          Check-in Time
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -342,19 +392,24 @@ export function EventRegistration() {
                             {registration.attendee?.placeOfResidence}
                           </td>
                           <td className="px-4 py-2">
-                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                              registration.attendee?.isFirstTimeGuest 
-                                ? 'bg-orange-100 text-orange-800' 
-                                : 'bg-green-100 text-green-800'
-                            }`}>
-                              {registration.attendee?.isFirstTimeGuest ? 'First-time' : 'Returning'}
+                            <span
+                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                registration.attendee?.isFirstTimeGuest
+                                  ? "bg-orange-100 text-orange-800"
+                                  : "bg-green-100 text-green-800"
+                              }`}
+                            >
+                              {registration.attendee?.isFirstTimeGuest
+                                ? "First-time"
+                                : "Returning"}
                             </span>
                           </td>
                           <td className="px-4 py-2 text-sm text-gray-500">
-                            {registration.attendanceTime 
-                              ? new Date(registration.attendanceTime).toLocaleTimeString()
-                              : '-'
-                            }
+                            {registration.attendanceTime
+                              ? new Date(
+                                  registration.attendanceTime,
+                                ).toLocaleTimeString()
+                              : "-"}
                           </td>
                         </tr>
                       ))}
@@ -370,7 +425,9 @@ export function EventRegistration() {
       {events.length === 0 && (
         <div className="text-center py-12">
           <div className="text-gray-500">No active events available</div>
-          <p className="text-sm text-gray-400 mt-2">Create an event first to start registering attendees</p>
+          <p className="text-sm text-gray-400 mt-2">
+            Create an event first to start registering attendees
+          </p>
         </div>
       )}
     </div>

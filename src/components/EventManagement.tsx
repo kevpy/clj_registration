@@ -90,11 +90,11 @@ export function EventManagement() {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Event Management</h2>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Event Management</h2>
         <button
           onClick={() => setShowCreateForm(true)}
-          className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 text-sm bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
         >
           Create New Event
         </button>
@@ -198,13 +198,13 @@ export function EventManagement() {
               <button
                 type="button"
                 onClick={() => setShowCreateForm(false)}
-                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 text-sm bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
               >
                 Create Event
               </button>
@@ -217,8 +217,8 @@ export function EventManagement() {
       <div className="space-y-4">
         {events.map((event) => (
           <div key={event._id} className="bg-white border rounded-lg p-6 shadow-sm">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
+              <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-2">
                   <h3 className="text-lg font-semibold text-gray-900">{event.name}</h3>
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -230,7 +230,7 @@ export function EventManagement() {
                   </span>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                <div className="grid grid-cols-1 gap-2 text-sm text-gray-600 mb-2">
                   <div>
                     <span className="font-medium">Date:</span> {new Date(event.date).toLocaleDateString()}
                   </div>
@@ -248,31 +248,37 @@ export function EventManagement() {
                 </div>
 
                 {event.description && (
-                  <p className="text-gray-600 mt-2">{event.description}</p>
+                  <p className="text-sm text-gray-600 mb-2">{event.description}</p>
                 )}
 
-                <div className="flex items-center gap-6 mt-3 text-sm">
-                  <span className="text-green-600">
-                    ✅ {event.attendedCount} checked in
+                <div className="flex flex-wrap gap-3 text-xs sm:text-sm">
+                  <span className="text-green-600 flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    {event.attendedCount} checked in
                   </span>
                   {event.maxCapacity && (
-                    <span className="text-gray-600">
-                      👥 Max: {event.maxCapacity}
+                    <span className="text-gray-600 flex items-center">
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                      </svg>
+                      Max: {event.maxCapacity}
                     </span>
                   )}
                 </div>
               </div>
 
-              <div className="flex gap-2 ml-4">
+              <div className="flex flex-shrink-0 gap-2 self-start">
                 <button
                   onClick={() => setSelectedEvent(selectedEvent === event._id ? null : event._id)}
-                  className="px-3 py-1 text-sm text-blue-600 border border-blue-600 rounded hover:bg-blue-50 transition-colors"
+                  className="px-3 py-1.5 text-xs sm:text-sm text-blue-600 border border-blue-600 rounded-md hover:bg-blue-50 transition-colors flex-1 min-w-[80px]"
                 >
                   {selectedEvent === event._id ? 'Hide Details' : 'View Details'}
                 </button>
                 <button
                   onClick={() => handleToggleEventStatus(event._id, event.isActive)}
-                  className={`px-3 py-1 text-sm border rounded transition-colors ${
+                  className={`px-3 py-1.5 text-xs sm:text-sm border rounded-md transition-colors flex-1 min-w-[80px] ${
                     event.isActive
                       ? 'text-red-600 border-red-600 hover:bg-red-50'
                       : 'text-green-600 border-green-600 hover:bg-green-50'
@@ -344,7 +350,7 @@ export function EventManagement() {
             <div className="text-gray-500">No events created yet</div>
             <button
               onClick={() => setShowCreateForm(true)}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              className="mt-4 px-4 py-2 text-sm bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
             >
               Create Your First Event
             </button>
