@@ -52,7 +52,7 @@ export function Dashboard() {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Dashboard Overview</h2>
+      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">Dashboard Overview</h2>
       
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

@@ -32,12 +32,40 @@ body {
   background: var(--color-light);
 }
 
-/* only use this to update the style of the auth input fields. use a different class for all other input fields */
-.auth-input-field {
-  @apply w-full px-4 py-3 rounded-container bg-white border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow shadow-sm hover:shadow;
+/* Professional input field styling */
+.input-field {
+  @apply w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all duration-200 shadow-sm hover:shadow-md;
 }
 
-/* only use this to update the style of the auth buttons. use the button class for all other buttons */
-.auth-button {
-  @apply w-full px-4 py-3 rounded bg-primary text-white font-semibold hover:bg-primary-hover transition-colors shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed;
+/* Professional button styling */
+.btn-primary {
+  @apply px-4 py-3 rounded-lg bg-primary-600 text-white font-semibold hover:bg-primary-700 transition-colors duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed;
 }
+
+.btn-secondary {
+  @apply px-4 py-3 rounded-lg bg-white text-gray-700 font-semibold border border-gray-300 hover:bg-gray-50 transition-colors duration-200 shadow-sm hover:shadow-md;
+}
+
+.btn-outline {
+  @apply px-4 py-3 rounded-lg border border-primary-600 text-primary-600 bg-transparent font-semibold hover:bg-primary-50 transition-colors duration-200;
+}
+
+/* Professional card styling */
+.card {
+  @apply bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200;
+}
+
+/* Professional table styling */
+.table {
+  @apply min-w-full divide-y divide-gray-200;
+}
+
+.table th {
+  @apply px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50;
+}
+
+.table td {
+  @apply px-4 py-3 whitespace-nowrap text-sm text-gray-900;
+}
+
+
