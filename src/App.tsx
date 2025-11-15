@@ -9,6 +9,7 @@ import { EventManagement } from "./components/EventManagement";
 import { EventRegistration } from "./components/EventRegistration";
 import { AttendeeList } from "./components/AttendeeList";
 import { Analytics } from "./components/Analytics";
+import { ExcelUpload } from "./components/ExcelUpload";
 
 export default function App() {
   return (
@@ -30,7 +31,7 @@ export default function App() {
 function Content() {
   const loggedInUser = useQuery(api.auth.loggedInUser);
   const [activeTab, setActiveTab] = useState<
-    "dashboard" | "events" | "register" | "attendees" | "analytics"
+    "dashboard" | "events" | "register" | "attendees" | "analytics" | "excel"
   >("dashboard");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -47,6 +48,7 @@ function Content() {
     { id: "events", label: "Events", icon: "🎉" },
     { id: "register", label: "Door Registration", icon: "🚪" },
     { id: "attendees", label: "All Attendees", icon: "👥" },
+    { id: "excel", label: "Excel Upload", icon: "📄" },
     { id: "analytics", label: "Analytics", icon: "📈" },
   ];
 
@@ -121,6 +123,7 @@ function Content() {
               {activeTab === "events" && <EventManagement />}
               {activeTab === "register" && <EventRegistration />}
               {activeTab === "attendees" && <AttendeeList />}
+              {activeTab === "excel" && <ExcelUpload />}
               {activeTab === "analytics" && <Analytics />}
             </div>
           </div>
