@@ -115,8 +115,16 @@ export const registerAttendeeAtDoor = mutation({
     // await ctx.db.patch(attendeeId, { isFirstTimeGuest: false });
     // AFTER inserting registration.
 
-    const attendeeRecord = await ctx.db.get(attendeeId);
-    if (attendeeRecord && attendeeRecord.isFirstTimeGuest) {
+    // 5. If they have prior registrations, ensure they are marked as returning (isFirstTimeGuest = false)
+    // We check for registrations BEFORE this one was just added.
+    // Actually, we just added one. So we can check if total registrations > 1.
+    const allRegistrations = await ctx.db
+      .query("eventRegistrations")
+      .withIndex("by_attendee", (q) => q.eq("attendeeId", attendeeId))
+      .collect();
+
+    if (allRegistrations.length > 1) {
+      // They have registered for more than just this event, so they are a returning guest
       await ctx.db.patch(attendeeId, {
         isFirstTimeGuest: false,
       });
@@ -179,9 +187,13 @@ export const recordAttendance = mutation({
       attendanceTime: Date.now(),
     });
 
-    // If this is their first attendance ever, mark them as no longer first-time
-    const attendee = await ctx.db.get(args.attendeeId);
-    if (attendee && attendee.isFirstTimeGuest) {
+    // If they have multiple registrations, mark them as returning
+    const allRegistrations = await ctx.db
+      .query("eventRegistrations")
+      .withIndex("by_attendee", (q) => q.eq("attendeeId", args.attendeeId))
+      .collect();
+
+    if (allRegistrations.length > 1) {
       await ctx.db.patch(args.attendeeId, {
         isFirstTimeGuest: false,
       });
