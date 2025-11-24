@@ -2,9 +2,10 @@ interface RecentAttendeesListProps {
     registrations: any[];
     loadMore: (numItems: number) => void;
     status: "CanLoadMore" | "LoadingMore" | "Exhausted" | "LoadingFirstPage";
+    onEdit: (attendee: any) => void;
 }
 
-export function RecentAttendeesList({ registrations, loadMore, status }: RecentAttendeesListProps) {
+export function RecentAttendeesList({ registrations, loadMore, status, onEdit }: RecentAttendeesListProps) {
     if (!registrations) return null;
 
     return (
@@ -37,6 +38,9 @@ export function RecentAttendeesList({ registrations, loadMore, status }: RecentA
                                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                                     Check-in Time
                                 </th>
+                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                    Actions
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
@@ -67,6 +71,14 @@ export function RecentAttendeesList({ registrations, loadMore, status }: RecentA
                                         {registration.attendanceTime
                                             ? new Date(registration.attendanceTime).toLocaleTimeString()
                                             : "-"}
+                                    </td>
+                                    <td className="px-4 py-2 text-sm text-gray-500">
+                                        <button
+                                            onClick={() => onEdit(registration.attendee)}
+                                            className="text-blue-600 hover:text-blue-900"
+                                        >
+                                            Edit
+                                        </button>
                                     </td>
                                 </tr>
                             ))}

@@ -3,6 +3,7 @@ import { useQuery, useMutation, usePaginatedQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
 import { Id } from "../../convex/_generated/dataModel";
+import { EditAttendeeModal } from "./EditAttendeeModal";
 
 export function AttendeeList() {
   const events = useQuery(api.events.getAllEvents, { includeInactive: false });
@@ -11,6 +12,7 @@ export function AttendeeList() {
   const [filterGender, setFilterGender] = useState("");
   const [filterGuestType, setFilterGuestType] = useState("");
   const [showAttendedOnly, setShowAttendedOnly] = useState(false);
+  const [editingAttendee, setEditingAttendee] = useState<any>(null);
 
   const recordAttendance = useMutation(api.registrations.recordAttendance);
 
@@ -18,7 +20,8 @@ export function AttendeeList() {
     api.registrations.getEventRegistrations,
     selectedEventId ? {
       eventId: selectedEventId as any,
-      attendedOnly: showAttendedOnly
+      attendedOnly: showAttendedOnly,
+      searchTerm: searchTerm.length >= 2 ? searchTerm : undefined,
     } : "skip",
     { initialNumItems: 10 }
   );
@@ -26,10 +29,19 @@ export function AttendeeList() {
   const filteredRegistrations = eventRegistrations?.filter(registration => {
     if (!registration.attendee) return false;
 
+    // Client-side filtering for other fields since search is now server-side (mostly)
+    // or if search term is short, we might still want client side filtering?
+    // Actually, if we use server side search, the results are already filtered by name.
+    // But we still need to filter by gender/guest type on the client for the loaded page.
+
     const attendee = registration.attendee;
-    const matchesSearch = attendee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    // We only client-side filter search if we didn't send it to server (length < 2)
+    const matchesSearch = searchTerm.length < 2 ? (
+      attendee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       attendee.placeOfResidence.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      attendee.phoneNumber?.includes(searchTerm) || false;
+      attendee.phoneNumber?.includes(searchTerm) || false
+    ) : true;
+
     const matchesGender = !filterGender || attendee.gender === filterGender;
     const matchesGuestType = !filterGuestType ||
       (filterGuestType === 'first-time' && attendee.isFirstTimeGuest) ||
@@ -186,6 +198,9 @@ export function AttendeeList() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Attended
                       </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -248,6 +263,14 @@ export function AttendeeList() {
                             </button>
                           )}
                         </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <button
+                            onClick={() => setEditingAttendee(registration.attendee)}
+                            className="text-blue-600 hover:text-blue-900"
+                          >
+                            Edit
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -290,6 +313,14 @@ export function AttendeeList() {
           <div className="text-gray-500">No events available</div>
           <p className="text-sm text-gray-400 mt-2">Create an event first to start managing attendees</p>
         </div>
+      )}
+
+      {editingAttendee && (
+        <EditAttendeeModal
+          isOpen={!!editingAttendee}
+          onClose={() => setEditingAttendee(null)}
+          attendee={editingAttendee}
+        />
       )}
     </div>
   );

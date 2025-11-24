@@ -7,6 +7,7 @@ import { AttendeeSearch } from "./registration/AttendeeSearch";
 import { RegistrationForm } from "./registration/RegistrationForm";
 import { RecentAttendeesList } from "./registration/RecentAttendeesList";
 import { Id } from "../../convex/_generated/dataModel";
+import { EditAttendeeModal } from "./EditAttendeeModal";
 
 export function EventRegistration() {
   const events = useQuery(api.events.getAllEvents, { includeInactive: false });
@@ -24,6 +25,7 @@ export function EventRegistration() {
     isFirstTimeGuest: true,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingAttendee, setEditingAttendee] = useState<any>(null);
 
   const searchResults = useQuery(
     api.registrations.searchAttendees,
@@ -161,6 +163,7 @@ export function EventRegistration() {
             registrations={eventRegistrations || []}
             loadMore={loadMore}
             status={status}
+            onEdit={setEditingAttendee}
           />
         </>
       )}
@@ -172,6 +175,14 @@ export function EventRegistration() {
             Create an event first to start registering attendees
           </p>
         </div>
+      )}
+
+      {editingAttendee && (
+        <EditAttendeeModal
+          isOpen={!!editingAttendee}
+          onClose={() => setEditingAttendee(null)}
+          attendee={editingAttendee}
+        />
       )}
     </div>
   );

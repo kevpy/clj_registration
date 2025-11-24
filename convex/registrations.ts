@@ -191,16 +191,85 @@ export const recordAttendance = mutation({
   },
 });
 
+export const updateAttendee = mutation({
+  args: {
+    attendeeId: v.id("attendees"),
+    updates: v.object({
+      name: v.optional(v.string()),
+      placeOfResidence: v.optional(v.string()),
+      phoneNumber: v.optional(v.string()),
+      gender: v.optional(v.union(v.literal("male"), v.literal("female"), v.literal("other"))),
+      isFirstTimeGuest: v.optional(v.boolean()),
+    }),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+
+    await ctx.db.patch(args.attendeeId, args.updates);
+  },
+});
+
 export const getEventRegistrations = query({
   args: {
     eventId: v.id("events"),
     attendedOnly: v.optional(v.boolean()),
+    searchTerm: v.optional(v.string()),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
       throw new Error("Not authenticated");
+    }
+
+    if (args.searchTerm) {
+      // Search implementation
+      const attendees = await ctx.db
+        .query("attendees")
+        .withSearchIndex("search_attendees", (q) =>
+          q.search("name", args.searchTerm!)
+        )
+        .take(20);
+
+      const attendeeIds = attendees.map((a) => a._id);
+
+      // Fetch registrations for these attendees and this event
+      const registrations = await Promise.all(
+        attendeeIds.map(async (attendeeId) => {
+          const registration = await ctx.db
+            .query("eventRegistrations")
+            .withIndex("by_event_and_attendee", (q) =>
+              q.eq("eventId", args.eventId).eq("attendeeId", attendeeId)
+            )
+            .unique();
+          return registration;
+        })
+      );
+
+      // Filter out nulls (attendees not registered for this event) and apply attendedOnly filter if needed
+      const validRegistrations = registrations.filter((r) => {
+        if (!r) return false;
+        if (args.attendedOnly && !r.hasAttended) return false;
+        return true;
+      });
+
+      // Map to include attendee details (we already have them, but to keep structure consistent)
+      const pageWithAttendees = validRegistrations.map((r) => {
+        const attendee = attendees.find((a) => a._id === r!.attendeeId);
+        return {
+          ...r!,
+          attendee,
+        };
+      });
+
+      return {
+        page: pageWithAttendees,
+        isDone: true,
+        continueCursor: "",
+      };
     }
 
     let registrations;
