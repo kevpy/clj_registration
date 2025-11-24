@@ -27,7 +27,7 @@ export async function getOrCreateAttendee(
         attendeeData: {
             name: string;
             placeOfResidence: string;
-            phoneNumber: string;
+            phoneNumber?: string;
             gender: "male" | "female" | "other";
             email?: string;
         };
@@ -52,16 +52,37 @@ export async function getOrCreateAttendee(
             });
         }
     } else {
-        // Create new attendee or find existing by phone
-        const existingAttendee = await ctx.db
-            .query("attendees")
-            .withIndex("by_phone", (q) => q.eq("phoneNumber", args.attendeeData.phoneNumber))
-            .unique();
+        // Try to find existing attendee
+        let existingAttendee = null;
+
+        // 1. Try by phone number if provided
+        if (args.attendeeData.phoneNumber) {
+            existingAttendee = await ctx.db
+                .query("attendees")
+                .withIndex("by_phone", (q) => q.eq("phoneNumber", args.attendeeData.phoneNumber!))
+                .unique();
+        }
+
+        // 2. If not found by phone (or no phone), try by Name + Location
+        if (!existingAttendee) {
+            const candidates = await ctx.db
+                .query("attendees")
+                .withIndex("by_name", (q) => q.eq("name", args.attendeeData.name))
+                .collect();
+
+            // Filter by location (case-insensitive)
+            const locationToMatch = args.attendeeData.placeOfResidence.toLowerCase().trim();
+            existingAttendee = candidates.find(c =>
+                c.placeOfResidence.toLowerCase().trim() === locationToMatch
+            ) || null;
+        }
 
         if (existingAttendee) {
             attendeeId = existingAttendee._id;
 
             // Update attendee info and first-time status
+            // Only update phone if the new data has it and the old one didn't, or if we want to overwrite?
+            // Let's overwrite for now to keep data fresh.
             await ctx.db.patch(existingAttendee._id, {
                 ...args.attendeeData,
                 isFirstTimeGuest: args.isFirstTimeGuest,

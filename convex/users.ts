@@ -4,7 +4,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 
 // Legacy functions for backward compatibility
 export const searchUsers = query({
-  args: { 
+  args: {
     searchTerm: v.string(),
     limit: v.optional(v.number()),
   },
@@ -63,7 +63,7 @@ export const registerUser = mutation({
   args: {
     name: v.string(),
     placeOfResidence: v.string(),
-    phoneNumber: v.string(),
+    phoneNumber: v.optional(v.string()),
     gender: v.union(v.literal("male"), v.literal("female"), v.literal("other")),
     isFirstTimeGuest: v.boolean(),
   },
@@ -100,7 +100,7 @@ export const getUserWithAttendance = query({
     return {
       ...attendee,
       attendanceCount: registrations.filter(r => r.hasAttended).length,
-      lastAttendance: registrations.length > 0 
+      lastAttendance: registrations.length > 0
         ? Math.max(...registrations.map(r => r.registrationTime))
         : null,
     };

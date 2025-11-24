@@ -23,7 +23,7 @@ const applicationTables = {
   attendees: defineTable({
     name: v.string(),
     placeOfResidence: v.string(),
-    phoneNumber: v.string(),
+    phoneNumber: v.optional(v.string()),
     gender: v.union(v.literal("male"), v.literal("female"), v.literal("other")),
     email: v.optional(v.string()),
     isFirstTimeGuest: v.boolean(), // Per-attendee basis - true if they've never attended before

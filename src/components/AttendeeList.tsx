@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { toast } from "sonner";
+import { Id } from "../../convex/_generated/dataModel";
 
 export function AttendeeList() {
   const events = useQuery(api.events.getAllEvents, { includeInactive: false });
@@ -10,28 +12,72 @@ export function AttendeeList() {
   const [filterGuestType, setFilterGuestType] = useState("");
   const [showAttendedOnly, setShowAttendedOnly] = useState(false);
 
+  const recordAttendance = useMutation(api.registrations.recordAttendance).withOptimisticUpdate(
+    (localStore, args) => {
+      const { eventId, attendeeId } = args;
+      // We need to update the getEventRegistrations query
+      // The args must match exactly what was passed to useQuery
+      const queryArgs = {
+        eventId,
+        attendedOnly: showAttendedOnly
+      };
+
+      const currentRegistrations = localStore.getQuery(api.registrations.getEventRegistrations, queryArgs);
+
+      if (currentRegistrations) {
+        const updatedRegistrations = currentRegistrations.map((reg) => {
+          if (reg.attendeeId === attendeeId) {
+            return {
+              ...reg,
+              hasAttended: true,
+              attendanceTime: Date.now(),
+            };
+          }
+          return reg;
+        });
+
+        localStore.setQuery(api.registrations.getEventRegistrations, queryArgs, updatedRegistrations);
+      }
+    }
+  );
+
   const eventRegistrations = useQuery(
     api.registrations.getEventRegistrations,
-    selectedEventId ? { 
+    selectedEventId ? {
       eventId: selectedEventId as any,
-      attendedOnly: showAttendedOnly 
+      attendedOnly: showAttendedOnly
     } : "skip"
   );
 
   const filteredRegistrations = eventRegistrations?.filter(registration => {
     if (!registration.attendee) return false;
-    
+
     const attendee = registration.attendee;
     const matchesSearch = attendee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         attendee.placeOfResidence.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         attendee.phoneNumber.includes(searchTerm);
+      attendee.placeOfResidence.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      attendee.phoneNumber?.includes(searchTerm) || false;
     const matchesGender = !filterGender || attendee.gender === filterGender;
-    const matchesGuestType = !filterGuestType || 
-                            (filterGuestType === 'first-time' && attendee.isFirstTimeGuest) ||
-                            (filterGuestType === 'returning' && !attendee.isFirstTimeGuest);
-    
+    const matchesGuestType = !filterGuestType ||
+      (filterGuestType === 'first-time' && attendee.isFirstTimeGuest) ||
+      (filterGuestType === 'returning' && !attendee.isFirstTimeGuest);
+
     return matchesSearch && matchesGender && matchesGuestType;
   });
+
+  const handleCheckIn = async (attendeeId: Id<"attendees">, attendeeName: string) => {
+    if (!selectedEventId) return;
+
+    try {
+      await recordAttendance({
+        eventId: selectedEventId as Id<"events">,
+        attendeeId,
+      });
+      toast.success(`Checked in ${attendeeName}`);
+    } catch (error) {
+      toast.error("Failed to check in attendee");
+      console.error(error);
+    }
+  };
 
   if (!events) {
     return (
@@ -98,7 +144,7 @@ export function AttendeeList() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-            
+
             <select
               value={filterGender}
               onChange={(e) => setFilterGender(e.target.value)}
@@ -188,7 +234,7 @@ export function AttendeeList() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">
-                            {registration.attendee?.phoneNumber}
+                            {registration.attendee?.phoneNumber || "-"}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -197,11 +243,10 @@ export function AttendeeList() {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            registration.attendee?.isFirstTimeGuest 
-                              ? 'bg-orange-100 text-orange-800' 
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${registration.attendee?.isFirstTimeGuest
+                              ? 'bg-orange-100 text-orange-800'
                               : 'bg-green-100 text-green-800'
-                          }`}>
+                            }`}>
                             {registration.attendee?.isFirstTimeGuest ? 'First-time' : 'Returning'}
                           </span>
                         </td>
@@ -209,17 +254,24 @@ export function AttendeeList() {
                           {new Date(registration.registrationDate).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            registration.hasAttended 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {registration.hasAttended ? 'Yes' : 'No'}
-                          </span>
-                          {registration.hasAttended && registration.attendanceTime && (
-                            <div className="text-xs text-gray-500 mt-1">
-                              {new Date(registration.attendanceTime).toLocaleString()}
+                          {registration.hasAttended ? (
+                            <div>
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Yes
+                              </span>
+                              {registration.attendanceTime && (
+                                <div className="text-xs text-gray-500 mt-1">
+                                  {new Date(registration.attendanceTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </div>
+                              )}
                             </div>
+                          ) : (
+                            <button
+                              onClick={() => handleCheckIn(registration.attendeeId, registration.attendee?.name || "")}
+                              className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            >
+                              Check In
+                            </button>
                           )}
                         </td>
                       </tr>
@@ -231,8 +283,8 @@ export function AttendeeList() {
               {filteredRegistrations?.length === 0 && (
                 <div className="text-center py-12">
                   <div className="text-gray-500">
-                    {eventRegistrations.length === 0 
-                      ? "No registrations for this event yet" 
+                    {eventRegistrations.length === 0
+                      ? "No registrations for this event yet"
                       : "No attendees found matching your criteria"
                     }
                   </div>

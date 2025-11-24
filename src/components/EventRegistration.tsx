@@ -6,10 +6,59 @@ import { EventSelector } from "./registration/EventSelector";
 import { AttendeeSearch } from "./registration/AttendeeSearch";
 import { RegistrationForm } from "./registration/RegistrationForm";
 import { RecentAttendeesList } from "./registration/RecentAttendeesList";
+import { Id } from "../../convex/_generated/dataModel";
 
 export function EventRegistration() {
   const events = useQuery(api.events.getAllEvents, { includeInactive: false });
-  const registerAtDoor = useMutation(api.registrations.registerAttendeeAtDoor);
+
+  const registerAtDoor = useMutation(api.registrations.registerAttendeeAtDoor).withOptimisticUpdate(
+    (localStore, args) => {
+      const { eventId, attendeeData, isFirstTimeGuest } = args;
+
+      // Create optimistic attendee
+      const optimisticAttendee = {
+        _id: "optimistic_attendee_id" as Id<"attendees">,
+        _creationTime: Date.now(),
+        name: attendeeData.name,
+        placeOfResidence: attendeeData.placeOfResidence,
+        phoneNumber: attendeeData.phoneNumber || "", // Handle optional phone
+        gender: attendeeData.gender,
+        email: attendeeData.email,
+        isFirstTimeGuest: isFirstTimeGuest,
+        registeredBy: "optimistic_user_id" as Id<"users">,
+      };
+
+      // Create optimistic registration
+      const optimisticRegistration = {
+        _id: "optimistic_registration_id" as Id<"eventRegistrations">,
+        _creationTime: Date.now(),
+        eventId: eventId,
+        attendeeId: optimisticAttendee._id,
+        registrationDate: new Date().toISOString().split('T')[0],
+        registrationTime: Date.now(),
+        registeredBy: "optimistic_user_id" as Id<"users">,
+        hasAttended: true,
+        attendanceTime: Date.now(),
+        attendee: optimisticAttendee
+      };
+
+      // Update getEventRegistrations query
+      const queryArgs = { eventId };
+      const currentRegistrations = localStore.getQuery(api.registrations.getEventRegistrations, queryArgs);
+
+      if (currentRegistrations) {
+        // Add to the list. Assuming the list might be sorted by date/time, 
+        // appending is usually safe if the UI sorts, or if new ones are at the end.
+        // If the UI shows newest first, we might want to prepend if the query returns them that way,
+        // or append if the query returns oldest first.
+        // Let's append for now, as that's standard for "logs".
+        localStore.setQuery(api.registrations.getEventRegistrations, queryArgs, [
+          ...currentRegistrations,
+          optimisticRegistration
+        ]);
+      }
+    }
+  );
 
   const [selectedEventId, setSelectedEventId] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -48,7 +97,7 @@ export function EventRegistration() {
     setFormData({
       name: attendee.name,
       placeOfResidence: attendee.placeOfResidence,
-      phoneNumber: attendee.phoneNumber,
+      phoneNumber: attendee.phoneNumber || "",
       gender: attendee.gender,
       email: attendee.email || "",
       isFirstTimeGuest: attendee.isFirstTimeGuest,
@@ -67,7 +116,6 @@ export function EventRegistration() {
     if (
       !formData.name ||
       !formData.placeOfResidence ||
-      !formData.phoneNumber ||
       !formData.gender
     ) {
       toast.error("Please fill in all required fields");
@@ -81,7 +129,7 @@ export function EventRegistration() {
         attendeeData: {
           name: formData.name,
           placeOfResidence: formData.placeOfResidence,
-          phoneNumber: formData.phoneNumber,
+          phoneNumber: formData.phoneNumber ? formData.phoneNumber : undefined,
           gender: formData.gender as "male" | "female",
           email: formData.email || undefined,
         },
