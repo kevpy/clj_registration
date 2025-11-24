@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, usePaginatedQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
 import { Id } from "../../convex/_generated/dataModel";
@@ -12,41 +12,15 @@ export function AttendeeList() {
   const [filterGuestType, setFilterGuestType] = useState("");
   const [showAttendedOnly, setShowAttendedOnly] = useState(false);
 
-  const recordAttendance = useMutation(api.registrations.recordAttendance).withOptimisticUpdate(
-    (localStore, args) => {
-      const { eventId, attendeeId } = args;
-      // We need to update the getEventRegistrations query
-      // The args must match exactly what was passed to useQuery
-      const queryArgs = {
-        eventId,
-        attendedOnly: showAttendedOnly
-      };
+  const recordAttendance = useMutation(api.registrations.recordAttendance);
 
-      const currentRegistrations = localStore.getQuery(api.registrations.getEventRegistrations, queryArgs);
-
-      if (currentRegistrations) {
-        const updatedRegistrations = currentRegistrations.map((reg) => {
-          if (reg.attendeeId === attendeeId) {
-            return {
-              ...reg,
-              hasAttended: true,
-              attendanceTime: Date.now(),
-            };
-          }
-          return reg;
-        });
-
-        localStore.setQuery(api.registrations.getEventRegistrations, queryArgs, updatedRegistrations);
-      }
-    }
-  );
-
-  const eventRegistrations = useQuery(
+  const { results: eventRegistrations, status, loadMore } = usePaginatedQuery(
     api.registrations.getEventRegistrations,
     selectedEventId ? {
       eventId: selectedEventId as any,
       attendedOnly: showAttendedOnly
-    } : "skip"
+    } : "skip",
+    { initialNumItems: 10 }
   );
 
   const filteredRegistrations = eventRegistrations?.filter(registration => {
@@ -244,8 +218,8 @@ export function AttendeeList() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${registration.attendee?.isFirstTimeGuest
-                              ? 'bg-orange-100 text-orange-800'
-                              : 'bg-green-100 text-green-800'
+                            ? 'bg-orange-100 text-orange-800'
+                            : 'bg-green-100 text-green-800'
                             }`}>
                             {registration.attendee?.isFirstTimeGuest ? 'First-time' : 'Returning'}
                           </span>
@@ -279,6 +253,16 @@ export function AttendeeList() {
                   </tbody>
                 </table>
               </div>
+              {status === "CanLoadMore" && (
+                <div className="p-4 text-center border-t border-gray-200">
+                  <button
+                    onClick={() => loadMore(10)}
+                    className="px-4 py-2 text-sm text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
+                  >
+                    Load More
+                  </button>
+                </div>
+              )}
 
               {filteredRegistrations?.length === 0 && (
                 <div className="text-center py-12">

@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { paginationOptsValidator } from "convex/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { Id } from "./_generated/dataModel";
 import { checkEventCapacity, getOrCreateAttendee, checkRegistrationExists } from "./helpers";
@@ -194,6 +195,7 @@ export const getEventRegistrations = query({
   args: {
     eventId: v.id("events"),
     attendedOnly: v.optional(v.boolean()),
+    paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -208,17 +210,19 @@ export const getEventRegistrations = query({
         .withIndex("by_event_and_attendance", (q) =>
           q.eq("eventId", args.eventId).eq("hasAttended", true)
         )
-        .collect();
+        .order("desc")
+        .paginate(args.paginationOpts);
     } else {
       registrations = await ctx.db
         .query("eventRegistrations")
         .withIndex("by_event", (q) => q.eq("eventId", args.eventId))
-        .collect();
+        .order("desc")
+        .paginate(args.paginationOpts);
     }
 
     // Get attendee details
-    const registrationsWithAttendees = await Promise.all(
-      registrations.map(async (registration) => {
+    const pageWithAttendees = await Promise.all(
+      registrations.page.map(async (registration) => {
         const attendee = await ctx.db.get(registration.attendeeId);
         return {
           ...registration,
@@ -227,7 +231,10 @@ export const getEventRegistrations = query({
       })
     );
 
-    return registrationsWithAttendees;
+    return {
+      ...registrations,
+      page: pageWithAttendees,
+    };
   },
 });
 

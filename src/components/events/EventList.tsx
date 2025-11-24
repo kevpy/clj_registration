@@ -1,4 +1,4 @@
-import { useQuery } from "convex/react";
+import { useQuery, usePaginatedQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 
 interface EventListProps {
@@ -49,9 +49,10 @@ function EventItem({
     onSelect: () => void;
     onToggleStatus: () => void;
 }) {
-    const eventDetails = useQuery(
-        api.events.getEventById,
-        isSelected ? { eventId: event._id } : "skip"
+    const { results: registrations, status, loadMore } = usePaginatedQuery(
+        api.registrations.getEventRegistrations,
+        isSelected ? { eventId: event._id } : "skip",
+        { initialNumItems: 5 }
     );
 
     return (
@@ -61,8 +62,8 @@ function EventItem({
                     <div className="flex items-center gap-3 mb-2">
                         <h3 className="text-lg font-semibold text-gray-900">{event.name}</h3>
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${event.isActive
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-gray-100 text-gray-800'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
                             }`}>
                             {event.isActive ? 'Active' : 'Inactive'}
                         </span>
@@ -117,8 +118,8 @@ function EventItem({
                     <button
                         onClick={onToggleStatus}
                         className={`px-3 py-1.5 text-xs sm:text-sm border rounded-md transition-colors flex-1 min-w-[80px] ${event.isActive
-                                ? 'text-red-600 border-red-600 hover:bg-red-50'
-                                : 'text-green-600 border-green-600 hover:bg-green-50'
+                            ? 'text-red-600 border-red-600 hover:bg-red-50'
+                            : 'text-green-600 border-green-600 hover:bg-green-50'
                             }`}
                     >
                         {event.isActive ? 'Deactivate' : 'Activate'}
@@ -127,10 +128,10 @@ function EventItem({
             </div>
 
             {/* Event Details */}
-            {isSelected && eventDetails && (
+            {isSelected && registrations && (
                 <div className="mt-6 pt-6 border-t border-gray-200">
                     <h4 className="text-md font-semibold text-gray-900 mb-4">Checked-in Attendees</h4>
-                    {eventDetails.registrations.length === 0 ? (
+                    {registrations.length === 0 ? (
                         <p className="text-gray-500 text-center py-4">No attendees checked in yet</p>
                     ) : (
                         <div className="overflow-x-auto">
@@ -145,7 +146,7 @@ function EventItem({
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
-                                    {eventDetails.registrations.map((registration) => (
+                                    {registrations.map((registration) => (
                                         <tr key={registration._id}>
                                             <td className="px-4 py-2 text-sm text-gray-900">
                                                 {registration.attendee?.name}
@@ -158,8 +159,8 @@ function EventItem({
                                             </td>
                                             <td className="px-4 py-2">
                                                 <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${registration.attendee?.isFirstTimeGuest
-                                                        ? 'bg-orange-100 text-orange-800'
-                                                        : 'bg-green-100 text-green-800'
+                                                    ? 'bg-orange-100 text-orange-800'
+                                                    : 'bg-green-100 text-green-800'
                                                     }`}>
                                                     {registration.attendee?.isFirstTimeGuest ? 'First-time' : 'Returning'}
                                                 </span>
@@ -174,6 +175,16 @@ function EventItem({
                                     ))}
                                 </tbody>
                             </table>
+                            {status === "CanLoadMore" && (
+                                <div className="mt-4 text-center">
+                                    <button
+                                        onClick={() => loadMore(5)}
+                                        className="px-4 py-2 text-sm text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
+                                    >
+                                        Load More
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
