@@ -246,11 +246,19 @@ export function Analytics() {
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">Select an event to analyze...</option>
-            {events.map((event) => (
-              <option key={event._id} value={event._id}>
-                {event.name} - {new Date(event.date).toLocaleDateString()}
-              </option>
-            ))}
+            {events
+              .filter((event) => {
+                const eventDate = new Date(event.date);
+                return (
+                  eventDate.getMonth() + 1 === selectedMonth &&
+                  eventDate.getFullYear() === selectedYear
+                );
+              })
+              .map((event) => (
+                <option key={event._id} value={event._id}>
+                  {event.name} - {new Date(event.date).toLocaleDateString()}
+                </option>
+              ))}
           </select>
         </div>
 
