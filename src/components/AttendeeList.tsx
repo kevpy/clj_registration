@@ -38,7 +38,7 @@ export function AttendeeList() {
     // We only client-side filter search if we didn't send it to server (length < 2)
     const matchesSearch = searchTerm.length < 2 ? (
       attendee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      attendee.placeOfResidence.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      attendee.placeOfResidence?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       attendee.phoneNumber?.includes(searchTerm) || false
     ) : true;
 
