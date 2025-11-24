@@ -39,7 +39,7 @@ export function EditAttendeeModal({ isOpen, onClose, attendee }: EditAttendeeMod
                 attendeeId: attendee._id,
                 updates: {
                     name: formData.name,
-                    placeOfResidence: formData.placeOfResidence || "-",
+                    placeOfResidence: formData.placeOfResidence,
                     phoneNumber: formData.phoneNumber || undefined,
                     gender: formData.gender,
                     isFirstTimeGuest: formData.isFirstTimeGuest,
@@ -102,7 +102,7 @@ export function EditAttendeeModal({ isOpen, onClose, attendee }: EditAttendeeMod
                                         value={formData.placeOfResidence}
                                         onChange={(e) => setFormData({ ...formData, placeOfResidence: e.target.value })}
                                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                        placeholder="-"
+                                        placeholder=""
                                     />
                                 </div>
 
