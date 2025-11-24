@@ -54,7 +54,7 @@ export const registerAttendeeAtDoor = mutation({
     eventId: v.id("events"),
     attendeeData: v.object({
       name: v.string(),
-      placeOfResidence: v.string(),
+      placeOfResidence: v.optional(v.string()),
       phoneNumber: v.optional(v.string()),
       gender: v.union(v.literal("male"), v.literal("female"), v.literal("other")),
       email: v.optional(v.string()),

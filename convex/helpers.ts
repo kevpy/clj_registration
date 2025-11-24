@@ -26,7 +26,7 @@ export async function getOrCreateAttendee(
     args: {
         attendeeData: {
             name: string;
-            placeOfResidence: string;
+            placeOfResidence?: string;
             phoneNumber?: string;
             gender: "male" | "female" | "other";
             email?: string;
@@ -63,8 +63,8 @@ export async function getOrCreateAttendee(
                 .unique();
         }
 
-        // 2. If not found by phone (or no phone), try by Name + Location
-        if (!existingAttendee) {
+        // 2. If not found by phone (or no phone), try by Name + Location (if location provided)
+        if (!existingAttendee && args.attendeeData.placeOfResidence) {
             const candidates = await ctx.db
                 .query("attendees")
                 .withIndex("by_name", (q) => q.eq("name", args.attendeeData.name))
@@ -73,7 +73,7 @@ export async function getOrCreateAttendee(
             // Filter by location (case-insensitive)
             const locationToMatch = args.attendeeData.placeOfResidence.toLowerCase().trim();
             existingAttendee = candidates.find(c =>
-                c.placeOfResidence.toLowerCase().trim() === locationToMatch
+                c.placeOfResidence?.toLowerCase().trim() === locationToMatch
             ) || null;
         }
 

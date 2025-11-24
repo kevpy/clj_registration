@@ -40,14 +40,13 @@ export function RegistrationForm({
 
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Place of Residence *
+                        Residence (Optional)
                     </label>
                     <input
                         type="text"
                         value={formData.placeOfResidence}
                         onChange={(e) => onChange("placeOfResidence", e.target.value)}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required
                     />
                 </div>
 
@@ -68,8 +67,8 @@ export function RegistrationForm({
                             ✓ Found existing attendee: {existingAttendee.name}
                             <span
                                 className={`ml-2 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${existingAttendee.isFirstTimeGuest
-                                        ? "bg-orange-100 text-orange-800"
-                                        : "bg-green-100 text-green-800"
+                                    ? "bg-orange-100 text-orange-800"
+                                    : "bg-green-100 text-green-800"
                                     }`}
                             >
                                 {existingAttendee.isFirstTimeGuest ? "First-time" : "Returning"}

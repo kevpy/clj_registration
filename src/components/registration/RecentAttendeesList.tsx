@@ -30,7 +30,7 @@ export function RecentAttendeesList({ registrations, loadMore, status, onEdit }:
                                     Phone
                                 </th>
                                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                                    Location
+                                    Residence
                                 </th>
                                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                                     Status
@@ -53,7 +53,7 @@ export function RecentAttendeesList({ registrations, loadMore, status, onEdit }:
                                         {registration.attendee?.phoneNumber}
                                     </td>
                                     <td className="px-4 py-2 text-sm text-gray-900">
-                                        {registration.attendee?.placeOfResidence}
+                                        {registration.attendee?.placeOfResidence || "-"}
                                     </td>
                                     <td className="px-4 py-2">
                                         <span

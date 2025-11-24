@@ -181,7 +181,7 @@ export function AttendeeList() {
                         Name
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Location
+                        Residence
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Phone
@@ -218,7 +218,7 @@ export function AttendeeList() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">
-                            {registration.attendee?.placeOfResidence}
+                            {registration.attendee?.placeOfResidence || "-"}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
