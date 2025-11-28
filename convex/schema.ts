@@ -51,6 +51,14 @@ const applicationTables = {
     .index("by_event_and_attendee", ["eventId", "attendeeId"])
     .index("by_registration_date", ["registrationDate"])
     .index("by_event_and_attendance", ["eventId", "hasAttended"]),
+
+  // Shareable links for reports
+  shareableLinks: defineTable({
+    token: v.string(),
+    eventId: v.id("events"),
+    expiresAt: v.number(), // timestamp
+    createdBy: v.id("users"),
+  }).index("by_token", ["token"]),
 };
 
 export default defineSchema({

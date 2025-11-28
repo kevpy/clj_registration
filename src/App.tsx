@@ -10,7 +10,18 @@ import AttendeesPage from "./pages/AttendeesPage";
 import ExcelUploadPage from "./pages/ExcelUploadPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 
+import SharedReportPage from "./pages/SharedReportPage";
+
 export default function App() {
+  return (
+    <Routes>
+      <Route path="/shared-report/:token" element={<SharedReportPage />} />
+      <Route path="*" element={<MainApp />} />
+    </Routes>
+  );
+}
+
+function MainApp() {
   return (
     <>
       <Authenticated>

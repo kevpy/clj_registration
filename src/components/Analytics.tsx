@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
 export function Analytics() {
@@ -237,7 +237,12 @@ export function Analytics() {
 
       {/* Event-Specific Analytics */}
       <div className="bg-white border rounded-lg p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Event-Specific Analytics</h3>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Event-Specific Analytics</h3>
+          {selectedEventId && (
+            <ShareReportButton eventId={selectedEventId} />
+          )}
+        </div>
 
         <div className="mb-4">
           <select
@@ -340,6 +345,64 @@ export function Analytics() {
           <p className="text-gray-500 text-center py-8">Select an event to view detailed analytics</p>
         )}
       </div>
+    </div>
+  );
+}
+
+function ShareReportButton({ eventId }: { eventId: string }) {
+  const generateLink = useMutation(api.reports.generateShareableLink);
+  const [generatedLink, setGeneratedLink] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleGenerate = async () => {
+    setIsLoading(true);
+    try {
+      const token = await generateLink({ eventId: eventId as any });
+      const url = `${window.location.origin}/shared-report/${token}`;
+      setGeneratedLink(url);
+    } catch (error) {
+      console.error("Failed to generate link:", error);
+      alert("Failed to generate link");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="relative">
+      {!generatedLink ? (
+        <button
+          onClick={handleGenerate}
+          disabled={isLoading}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm font-medium"
+        >
+          {isLoading ? "Generating..." : "Share Report"}
+        </button>
+      ) : (
+        <div className="flex items-center gap-2 bg-green-50 border border-green-200 px-3 py-2 rounded-lg">
+          <input
+            type="text"
+            readOnly
+            value={generatedLink}
+            className="bg-transparent text-sm text-green-800 w-48 truncate focus:outline-none"
+          />
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(generatedLink);
+              alert("Link copied!");
+            }}
+            className="text-green-600 hover:text-green-800 text-xs font-bold uppercase"
+          >
+            Copy
+          </button>
+          <button
+            onClick={() => setGeneratedLink(null)}
+            className="text-gray-400 hover:text-gray-600 ml-2"
+          >
+            ×
+          </button>
+        </div>
+      )}
     </div>
   );
 }
