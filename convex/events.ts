@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { checkRole } from "./helpers";
 
 export const createEvent = mutation({
   args: {
@@ -17,6 +18,9 @@ export const createEvent = mutation({
     if (!userId) {
       throw new Error("Not authenticated");
     }
+
+    // Check if user is admin
+    await checkRole(ctx, userId, "admin");
 
     const eventId = await ctx.db.insert("events", {
       ...args,
@@ -126,8 +130,11 @@ export const updateEvent = mutation({
       throw new Error("Not authenticated");
     }
 
+    // Check if user is admin
+    await checkRole(ctx, userId, "admin");
+
     const { eventId, ...updates } = args;
-    
+
     // Remove undefined values
     const cleanUpdates = Object.fromEntries(
       Object.entries(updates).filter(([_, value]) => value !== undefined)
@@ -147,7 +154,7 @@ export const getUpcomingEvents = query({
     }
 
     const today = new Date().toISOString().split('T')[0];
-    
+
     const events = await ctx.db
       .query("events")
       .withIndex("by_active", (q) => q.eq("isActive", true))

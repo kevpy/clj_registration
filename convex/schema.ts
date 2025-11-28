@@ -22,8 +22,8 @@ const applicationTables = {
   // Registered attendees/guests (separate from auth users)
   attendees: defineTable({
     name: v.string(),
-    placeOfResidence: v.string(),
-    phoneNumber: v.string(),
+    placeOfResidence: v.optional(v.string()),
+    phoneNumber: v.optional(v.string()),
     gender: v.union(v.literal("male"), v.literal("female"), v.literal("other")),
     email: v.optional(v.string()),
     isFirstTimeGuest: v.boolean(), // Per-attendee basis - true if they've never attended before
@@ -51,9 +51,27 @@ const applicationTables = {
     .index("by_event_and_attendee", ["eventId", "attendeeId"])
     .index("by_registration_date", ["registrationDate"])
     .index("by_event_and_attendance", ["eventId", "hasAttended"]),
+
+  // Shareable links for reports
+  shareableLinks: defineTable({
+    token: v.string(),
+    eventId: v.id("events"),
+    expiresAt: v.number(), // timestamp
+    createdBy: v.id("users"),
+  }).index("by_token", ["token"]),
 };
 
 export default defineSchema({
   ...authTables,
+  users: defineTable({
+    name: v.optional(v.string()),
+    image: v.optional(v.string()),
+    email: v.optional(v.string()),
+    emailVerificationTime: v.optional(v.number()),
+    phone: v.optional(v.string()),
+    phoneVerificationTime: v.optional(v.number()),
+    isAnonymous: v.optional(v.boolean()),
+    role: v.optional(v.union(v.literal("admin"), v.literal("user"))),
+  }).index("email", ["email"]),
   ...applicationTables,
 });

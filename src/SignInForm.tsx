@@ -1,4 +1,4 @@
-"use client";
+
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -16,12 +16,12 @@ export function SignInForm() {
             {flow === "signIn" ? "Welcome Back" : "Create Account"}
           </h2>
           <p className="text-gray-600">
-            {flow === "signIn" 
-              ? "Sign in to continue to your dashboard" 
+            {flow === "signIn"
+              ? "Sign in to continue to your dashboard"
               : "Create an account to get started"}
           </p>
         </div>
-        
+
         <form
           className="flex flex-col gap-4"
           onSubmit={(e) => {
@@ -57,7 +57,7 @@ export function SignInForm() {
               required
             />
           </div>
-          
+
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
               Password
@@ -71,10 +71,10 @@ export function SignInForm() {
               required
             />
           </div>
-          
-          <button 
-            className="btn-primary mt-2" 
-            type="submit" 
+
+          <button
+            className="btn-primary mt-2"
+            type="submit"
             disabled={submitting}
           >
             {submitting ? (
@@ -89,7 +89,7 @@ export function SignInForm() {
               flow === "signIn" ? "Sign in" : "Sign up"
             )}
           </button>
-          
+
           <div className="text-center text-sm text-gray-600 mt-4">
             <span>
               {flow === "signIn"
@@ -105,14 +105,14 @@ export function SignInForm() {
             </button>
           </div>
         </form>
-        
+
         <div className="flex items-center justify-center my-6">
           <div className="flex-grow border-t border-gray-200"></div>
           <span className="mx-4 text-gray-500 text-sm">or</span>
           <div className="flex-grow border-t border-gray-200"></div>
         </div>
-        
-        <button 
+
+        <button
           className="btn-secondary flex items-center justify-center gap-2"
           onClick={() => void signIn("anonymous")}
         >

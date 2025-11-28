@@ -1,10 +1,12 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { paginationOptsValidator } from "convex/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { Id } from "./_generated/dataModel";
+import { checkEventCapacity, getOrCreateAttendee, checkRegistrationExists } from "./helpers";
 
 export const searchAttendees = query({
-  args: { 
+  args: {
     searchTerm: v.string(),
     limit: v.optional(v.number()),
   },
@@ -52,8 +54,8 @@ export const registerAttendeeAtDoor = mutation({
     eventId: v.id("events"),
     attendeeData: v.object({
       name: v.string(),
-      placeOfResidence: v.string(),
-      phoneNumber: v.string(),
+      placeOfResidence: v.optional(v.string()),
+      phoneNumber: v.optional(v.string()),
       gender: v.union(v.literal("male"), v.literal("female"), v.literal("other")),
       email: v.optional(v.string()),
     }),
@@ -67,88 +69,25 @@ export const registerAttendeeAtDoor = mutation({
       throw new Error("Not authenticated");
     }
 
-    // Verify event exists and is active
-    const event = await ctx.db.get(args.eventId);
-    if (!event || !event.isActive) {
-      throw new Error("Event not found or inactive");
+    // 1. Verify event exists and check capacity
+    await checkEventCapacity(ctx, args.eventId);
+
+    // 2. Get or create attendee (and update their details)
+    const attendeeId = await getOrCreateAttendee(ctx, {
+      attendeeData: args.attendeeData,
+      isFirstTimeGuest: args.isFirstTimeGuest,
+      useExistingAttendee: args.useExistingAttendee,
+      existingAttendeeId: args.existingAttendeeId,
+      authUserId,
+    });
+
+    // 3. Check if already registered
+    const isRegistered = await checkRegistrationExists(ctx, args.eventId, attendeeId);
+    if (isRegistered) {
+      throw new Error("Attendee has already been registered for this event");
     }
 
-    let attendeeId: Id<"attendees">;
-
-    if (args.useExistingAttendee && args.existingAttendeeId) {
-      // Use existing attendee
-      attendeeId = args.existingAttendeeId;
-      
-      // Check if already registered for this event
-      const existingRegistration = await ctx.db
-        .query("eventRegistrations")
-        .withIndex("by_event_and_attendee", (q) => 
-          q.eq("eventId", args.eventId).eq("attendeeId", args.existingAttendeeId!)
-        )
-        .unique();
-
-      if (existingRegistration) {
-        throw new Error("Attendee has already been registered for this event");
-      }
-
-      // Update attendee info if needed
-      const existingAttendee = await ctx.db.get(args.existingAttendeeId);
-      if (existingAttendee) {
-        await ctx.db.patch(args.existingAttendeeId, {
-          ...args.attendeeData,
-          isFirstTimeGuest: args.isFirstTimeGuest,
-        });
-      }
-    } else {
-      // Create new attendee or find existing by phone
-      const existingAttendee = await ctx.db
-        .query("attendees")
-        .withIndex("by_phone", (q) => q.eq("phoneNumber", args.attendeeData.phoneNumber))
-        .unique();
-
-      if (existingAttendee) {
-        attendeeId = existingAttendee._id;
-        
-        // Check if already registered for this event
-        const existingRegistration = await ctx.db
-          .query("eventRegistrations")
-          .withIndex("by_event_and_attendee", (q) => 
-            q.eq("eventId", args.eventId).eq("attendeeId", existingAttendee._id)
-          )
-          .unique();
-
-        if (existingRegistration) {
-          throw new Error("Attendee has already been registered for this event");
-        }
-
-        // Update attendee info and first-time status
-        await ctx.db.patch(existingAttendee._id, {
-          ...args.attendeeData,
-          isFirstTimeGuest: args.isFirstTimeGuest,
-        });
-      } else {
-        // Create new attendee
-        attendeeId = await ctx.db.insert("attendees", {
-          ...args.attendeeData,
-          isFirstTimeGuest: args.isFirstTimeGuest,
-          registeredBy: authUserId,
-        });
-      }
-    }
-
-    // Check event capacity
-    if (event.maxCapacity) {
-      const currentRegistrations = await ctx.db
-        .query("eventRegistrations")
-        .withIndex("by_event", (q) => q.eq("eventId", args.eventId))
-        .collect();
-
-      if (currentRegistrations.length >= event.maxCapacity) {
-        throw new Error("Event has reached maximum capacity");
-      }
-    }
-
-    // Create event registration with immediate attendance
+    // 4. Create event registration with immediate attendance
     const today = new Date().toISOString().split('T')[0];
     const now = Date.now();
     const registrationId = await ctx.db.insert("eventRegistrations", {
@@ -161,9 +100,31 @@ export const registerAttendeeAtDoor = mutation({
       attendanceTime: now, // Record attendance time as now
     });
 
-    // If this is their first attendance ever, mark them as no longer first-time
-    const attendeeRecord = await ctx.db.get(attendeeId);
-    if (attendeeRecord && attendeeRecord.isFirstTimeGuest) {
+    // 5. If this is their first attendance ever, mark them as no longer first-time
+    // (This logic is slightly redundant with getOrCreateAttendee which sets isFirstTimeGuest based on input,
+    // but we want to ensure they are marked as NOT first time AFTER this attendance)
+    // Actually, getOrCreateAttendee sets it to what we passed.
+    // If we passed isFirstTimeGuest=true, they are saved as true.
+    // But now they have attended, so they should be false?
+    // The original logic was: set to input value, then if they attend, set to false?
+    // Original code: 
+    // "If this is their first attendance ever, mark them as no longer first-time"
+    // This implies we want to record that they CAME as a first timer, but for FUTURE they are not.
+    // So we should leave it as is for now, or update it to false immediately?
+    // The original code did: 
+    // await ctx.db.patch(attendeeId, { isFirstTimeGuest: false });
+    // AFTER inserting registration.
+
+    // 5. If they have prior registrations, ensure they are marked as returning (isFirstTimeGuest = false)
+    // We check for registrations BEFORE this one was just added.
+    // Actually, we just added one. So we can check if total registrations > 1.
+    const allRegistrations = await ctx.db
+      .query("eventRegistrations")
+      .withIndex("by_attendee", (q) => q.eq("attendeeId", attendeeId))
+      .collect();
+
+    if (allRegistrations.length > 1) {
+      // They have registered for more than just this event, so they are a returning guest
       await ctx.db.patch(attendeeId, {
         isFirstTimeGuest: false,
       });
@@ -180,7 +141,7 @@ export const registerAttendeeForEvent = mutation({
     attendeeData: v.object({
       name: v.string(),
       placeOfResidence: v.string(),
-      phoneNumber: v.string(),
+      phoneNumber: v.optional(v.string()),
       gender: v.union(v.literal("male"), v.literal("female"), v.literal("other")),
       email: v.optional(v.string()),
     }),
@@ -194,7 +155,7 @@ export const registerAttendeeForEvent = mutation({
 });
 
 export const recordAttendance = mutation({
-  args: { 
+  args: {
     eventId: v.id("events"),
     attendeeId: v.id("attendees"),
   },
@@ -207,7 +168,7 @@ export const recordAttendance = mutation({
     // Find the registration
     const registration = await ctx.db
       .query("eventRegistrations")
-      .withIndex("by_event_and_attendee", (q) => 
+      .withIndex("by_event_and_attendee", (q) =>
         q.eq("eventId", args.eventId).eq("attendeeId", args.attendeeId)
       )
       .unique();
@@ -226,9 +187,13 @@ export const recordAttendance = mutation({
       attendanceTime: Date.now(),
     });
 
-    // If this is their first attendance ever, mark them as no longer first-time
-    const attendee = await ctx.db.get(args.attendeeId);
-    if (attendee && attendee.isFirstTimeGuest) {
+    // If they have multiple registrations, mark them as returning
+    const allRegistrations = await ctx.db
+      .query("eventRegistrations")
+      .withIndex("by_attendee", (q) => q.eq("attendeeId", args.attendeeId))
+      .collect();
+
+    if (allRegistrations.length > 1) {
       await ctx.db.patch(args.attendeeId, {
         isFirstTimeGuest: false,
       });
@@ -238,10 +203,16 @@ export const recordAttendance = mutation({
   },
 });
 
-export const getEventRegistrations = query({
-  args: { 
-    eventId: v.id("events"),
-    attendedOnly: v.optional(v.boolean()),
+export const updateAttendee = mutation({
+  args: {
+    attendeeId: v.id("attendees"),
+    updates: v.object({
+      name: v.optional(v.string()),
+      placeOfResidence: v.optional(v.string()),
+      phoneNumber: v.optional(v.string()),
+      gender: v.optional(v.union(v.literal("male"), v.literal("female"), v.literal("other"))),
+      isFirstTimeGuest: v.optional(v.boolean()),
+    }),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -249,24 +220,90 @@ export const getEventRegistrations = query({
       throw new Error("Not authenticated");
     }
 
+    await ctx.db.patch(args.attendeeId, args.updates);
+  },
+});
+
+export const getEventRegistrations = query({
+  args: {
+    eventId: v.id("events"),
+    attendedOnly: v.optional(v.boolean()),
+    searchTerm: v.optional(v.string()),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+
+    if (args.searchTerm) {
+      // Search implementation
+      const attendees = await ctx.db
+        .query("attendees")
+        .withSearchIndex("search_attendees", (q) =>
+          q.search("name", args.searchTerm!)
+        )
+        .take(20);
+
+      const attendeeIds = attendees.map((a) => a._id);
+
+      // Fetch registrations for these attendees and this event
+      const registrations = await Promise.all(
+        attendeeIds.map(async (attendeeId) => {
+          const registration = await ctx.db
+            .query("eventRegistrations")
+            .withIndex("by_event_and_attendee", (q) =>
+              q.eq("eventId", args.eventId).eq("attendeeId", attendeeId)
+            )
+            .unique();
+          return registration;
+        })
+      );
+
+      // Filter out nulls (attendees not registered for this event) and apply attendedOnly filter if needed
+      const validRegistrations = registrations.filter((r) => {
+        if (!r) return false;
+        if (args.attendedOnly && !r.hasAttended) return false;
+        return true;
+      });
+
+      // Map to include attendee details (we already have them, but to keep structure consistent)
+      const pageWithAttendees = validRegistrations.map((r) => {
+        const attendee = attendees.find((a) => a._id === r!.attendeeId);
+        return {
+          ...r!,
+          attendee,
+        };
+      });
+
+      return {
+        page: pageWithAttendees,
+        isDone: true,
+        continueCursor: "",
+      };
+    }
+
     let registrations;
     if (args.attendedOnly) {
       registrations = await ctx.db
         .query("eventRegistrations")
-        .withIndex("by_event_and_attendance", (q) => 
+        .withIndex("by_event_and_attendance", (q) =>
           q.eq("eventId", args.eventId).eq("hasAttended", true)
         )
-        .collect();
+        .order("desc")
+        .paginate(args.paginationOpts);
     } else {
       registrations = await ctx.db
         .query("eventRegistrations")
         .withIndex("by_event", (q) => q.eq("eventId", args.eventId))
-        .collect();
+        .order("desc")
+        .paginate(args.paginationOpts);
     }
 
     // Get attendee details
-    const registrationsWithAttendees = await Promise.all(
-      registrations.map(async (registration) => {
+    const pageWithAttendees = await Promise.all(
+      registrations.page.map(async (registration) => {
         const attendee = await ctx.db.get(registration.attendeeId);
         return {
           ...registration,
@@ -275,7 +312,10 @@ export const getEventRegistrations = query({
       })
     );
 
-    return registrationsWithAttendees;
+    return {
+      ...registrations,
+      page: pageWithAttendees,
+    };
   },
 });
 

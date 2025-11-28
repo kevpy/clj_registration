@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation, usePaginatedQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { toast } from "sonner";
+import { Id } from "../../convex/_generated/dataModel";
+import { EditAttendeeModal } from "./EditAttendeeModal";
 
 export function AttendeeList() {
   const events = useQuery(api.events.getAllEvents, { includeInactive: false });
@@ -9,29 +12,58 @@ export function AttendeeList() {
   const [filterGender, setFilterGender] = useState("");
   const [filterGuestType, setFilterGuestType] = useState("");
   const [showAttendedOnly, setShowAttendedOnly] = useState(false);
+  const [editingAttendee, setEditingAttendee] = useState<any>(null);
 
-  const eventRegistrations = useQuery(
+  const recordAttendance = useMutation(api.registrations.recordAttendance);
+
+  const { results: eventRegistrations, status, loadMore } = usePaginatedQuery(
     api.registrations.getEventRegistrations,
-    selectedEventId ? { 
+    selectedEventId ? {
       eventId: selectedEventId as any,
-      attendedOnly: showAttendedOnly 
-    } : "skip"
+      attendedOnly: showAttendedOnly,
+      searchTerm: searchTerm.length >= 2 ? searchTerm : undefined,
+    } : "skip",
+    { initialNumItems: 10 }
   );
 
   const filteredRegistrations = eventRegistrations?.filter(registration => {
     if (!registration.attendee) return false;
-    
+
+    // Client-side filtering for other fields since search is now server-side (mostly)
+    // or if search term is short, we might still want client side filtering?
+    // Actually, if we use server side search, the results are already filtered by name.
+    // But we still need to filter by gender/guest type on the client for the loaded page.
+
     const attendee = registration.attendee;
-    const matchesSearch = attendee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         attendee.placeOfResidence.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         attendee.phoneNumber.includes(searchTerm);
+    // We only client-side filter search if we didn't send it to server (length < 2)
+    const matchesSearch = searchTerm.length < 2 ? (
+      attendee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      attendee.placeOfResidence?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      attendee.phoneNumber?.includes(searchTerm) || false
+    ) : true;
+
     const matchesGender = !filterGender || attendee.gender === filterGender;
-    const matchesGuestType = !filterGuestType || 
-                            (filterGuestType === 'first-time' && attendee.isFirstTimeGuest) ||
-                            (filterGuestType === 'returning' && !attendee.isFirstTimeGuest);
-    
+    const matchesGuestType = !filterGuestType ||
+      (filterGuestType === 'first-time' && attendee.isFirstTimeGuest) ||
+      (filterGuestType === 'returning' && !attendee.isFirstTimeGuest);
+
     return matchesSearch && matchesGender && matchesGuestType;
   });
+
+  const handleCheckIn = async (attendeeId: Id<"attendees">, attendeeName: string) => {
+    if (!selectedEventId) return;
+
+    try {
+      await recordAttendance({
+        eventId: selectedEventId as Id<"events">,
+        attendeeId,
+      });
+      toast.success(`Checked in ${attendeeName}`);
+    } catch (error) {
+      toast.error("Failed to check in attendee");
+      console.error(error);
+    }
+  };
 
   if (!events) {
     return (
@@ -98,7 +130,7 @@ export function AttendeeList() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-            
+
             <select
               value={filterGender}
               onChange={(e) => setFilterGender(e.target.value)}
@@ -149,7 +181,7 @@ export function AttendeeList() {
                         Name
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Location
+                        Residence
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Phone
@@ -165,6 +197,9 @@ export function AttendeeList() {
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Attended
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
                       </th>
                     </tr>
                   </thead>
@@ -183,12 +218,12 @@ export function AttendeeList() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">
-                            {registration.attendee?.placeOfResidence}
+                            {registration.attendee?.placeOfResidence || "-"}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">
-                            {registration.attendee?.phoneNumber}
+                            {registration.attendee?.phoneNumber || "-"}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -197,11 +232,10 @@ export function AttendeeList() {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            registration.attendee?.isFirstTimeGuest 
-                              ? 'bg-orange-100 text-orange-800' 
-                              : 'bg-green-100 text-green-800'
-                          }`}>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${registration.attendee?.isFirstTimeGuest
+                            ? 'bg-orange-100 text-orange-800'
+                            : 'bg-green-100 text-green-800'
+                            }`}>
                             {registration.attendee?.isFirstTimeGuest ? 'First-time' : 'Returning'}
                           </span>
                         </td>
@@ -209,30 +243,55 @@ export function AttendeeList() {
                           {new Date(registration.registrationDate).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            registration.hasAttended 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {registration.hasAttended ? 'Yes' : 'No'}
-                          </span>
-                          {registration.hasAttended && registration.attendanceTime && (
-                            <div className="text-xs text-gray-500 mt-1">
-                              {new Date(registration.attendanceTime).toLocaleString()}
+                          {registration.hasAttended ? (
+                            <div>
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Yes
+                              </span>
+                              {registration.attendanceTime && (
+                                <div className="text-xs text-gray-500 mt-1">
+                                  {new Date(registration.attendanceTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </div>
+                              )}
                             </div>
+                          ) : (
+                            <button
+                              onClick={() => handleCheckIn(registration.attendeeId, registration.attendee?.name || "")}
+                              className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            >
+                              Check In
+                            </button>
                           )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <button
+                            onClick={() => setEditingAttendee(registration.attendee)}
+                            className="text-blue-600 hover:text-blue-900"
+                          >
+                            Edit
+                          </button>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
+              {status === "CanLoadMore" && (
+                <div className="p-4 text-center border-t border-gray-200">
+                  <button
+                    onClick={() => loadMore(10)}
+                    className="px-4 py-2 text-sm text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
+                  >
+                    Load More
+                  </button>
+                </div>
+              )}
 
               {filteredRegistrations?.length === 0 && (
                 <div className="text-center py-12">
                   <div className="text-gray-500">
-                    {eventRegistrations.length === 0 
-                      ? "No registrations for this event yet" 
+                    {eventRegistrations.length === 0
+                      ? "No registrations for this event yet"
                       : "No attendees found matching your criteria"
                     }
                   </div>
@@ -254,6 +313,14 @@ export function AttendeeList() {
           <div className="text-gray-500">No events available</div>
           <p className="text-sm text-gray-400 mt-2">Create an event first to start managing attendees</p>
         </div>
+      )}
+
+      {editingAttendee && (
+        <EditAttendeeModal
+          isOpen={!!editingAttendee}
+          onClose={() => setEditingAttendee(null)}
+          attendee={editingAttendee}
+        />
       )}
     </div>
   );
