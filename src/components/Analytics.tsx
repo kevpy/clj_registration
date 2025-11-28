@@ -237,7 +237,7 @@ export function Analytics() {
 
       {/* Event-Specific Analytics */}
       <div className="bg-white border rounded-lg p-6 shadow-sm">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
           <h3 className="text-lg font-semibold text-gray-900">Event-Specific Analytics</h3>
           {selectedEventId && (
             <ShareReportButton eventId={selectedEventId} />
@@ -384,7 +384,7 @@ function ShareReportButton({ eventId }: { eventId: string }) {
             type="text"
             readOnly
             value={generatedLink}
-            className="bg-transparent text-sm text-green-800 w-48 truncate focus:outline-none"
+            className="bg-transparent text-sm text-green-800 w-32 sm:w-48 truncate focus:outline-none"
           />
           <button
             onClick={() => {
