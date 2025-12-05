@@ -111,7 +111,7 @@ function EventItem({
                 <div className="flex flex-shrink-0 gap-2 self-start">
                     <button
                         onClick={onSelect}
-                        className="px-3 py-1.5 text-xs sm:text-sm text-blue-600 border border-blue-600 rounded-md hover:bg-blue-50 transition-colors flex-1 min-w-[80px]"
+                        className="px-3 py-1.5 text-xs sm:text-sm text-primary-600 border border-primary-600 rounded-md hover:bg-primary-50 transition-colors flex-1 min-w-[80px]"
                     >
                         {isSelected ? 'Hide Details' : 'View Details'}
                     </button>
@@ -179,7 +179,7 @@ function EventItem({
                                 <div className="mt-4 text-center">
                                     <button
                                         onClick={() => loadMore(5)}
-                                        className="px-4 py-2 text-sm text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
+                                        className="px-4 py-2 text-sm text-primary-600 bg-primary-50 hover:bg-primary-100 rounded-md transition-colors"
                                     >
                                         Load More
                                     </button>

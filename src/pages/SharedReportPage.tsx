@@ -36,7 +36,7 @@ export default function SharedReportPage() {
         <div className="min-h-screen bg-gray-50 p-4 sm:p-8 print:bg-white print:p-0">
             <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden print:shadow-none">
                 {/* Header */}
-                <div className="bg-blue-600 p-6 text-white print:bg-white print:text-black print:border-b-2 print:border-gray-300">
+                <div className="bg-primary p-6 text-white print:bg-white print:text-black print:border-b-2 print:border-gray-300">
                     <div className="flex justify-between items-start">
                         <div>
                             <h1 className="text-2xl font-bold mb-2">Event Attendance Report</h1>
@@ -52,7 +52,7 @@ export default function SharedReportPage() {
                         </div>
                         <button
                             onClick={() => window.print()}
-                            className="bg-white text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-blue-50 transition-colors print:hidden"
+                            className="bg-white text-primary px-4 py-2 rounded-lg font-medium hover:bg-primary-50 transition-colors print:hidden"
                         >
                             Print / Save PDF
                         </button>

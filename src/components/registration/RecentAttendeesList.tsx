@@ -75,7 +75,7 @@ export function RecentAttendeesList({ registrations, loadMore, status, onEdit }:
                                     <td className="px-4 py-2 text-sm text-gray-500">
                                         <button
                                             onClick={() => onEdit(registration.attendee)}
-                                            className="text-blue-600 hover:text-blue-900"
+                                            className="text-primary-600 hover:text-primary-900"
                                         >
                                             Edit
                                         </button>
@@ -90,7 +90,7 @@ export function RecentAttendeesList({ registrations, loadMore, status, onEdit }:
                 <div className="mt-4 text-center">
                     <button
                         onClick={() => loadMore(10)}
-                        className="px-4 py-2 text-sm text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
+                        className="px-4 py-2 text-sm text-primary-600 bg-primary-50 hover:bg-primary-100 rounded-md transition-colors"
                     >
                         Load More
                     </button>

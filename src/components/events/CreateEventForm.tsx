@@ -33,7 +33,7 @@ export function CreateEventForm({
                             type="text"
                             value={formData.name}
                             onChange={(e) => onChange("name", e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                             required
                         />
                     </div>
@@ -47,7 +47,7 @@ export function CreateEventForm({
                             type="date"
                             value={formData.date}
                             onChange={(e) => onChange("date", e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                             required
                         />
                     </div>
@@ -61,7 +61,7 @@ export function CreateEventForm({
                             type="time"
                             value={formData.startTime}
                             onChange={(e) => onChange("startTime", e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                         />
                     </div>
 
@@ -74,7 +74,7 @@ export function CreateEventForm({
                             type="time"
                             value={formData.endTime}
                             onChange={(e) => onChange("endTime", e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                         />
                     </div>
 
@@ -87,7 +87,7 @@ export function CreateEventForm({
                             type="text"
                             value={formData.location}
                             onChange={(e) => onChange("location", e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                         />
                     </div>
 
@@ -100,7 +100,7 @@ export function CreateEventForm({
                             type="number"
                             value={formData.maxCapacity}
                             onChange={(e) => onChange("maxCapacity", e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                             min="1"
                         />
                     </div>
@@ -115,7 +115,7 @@ export function CreateEventForm({
                         value={formData.description}
                         onChange={(e) => onChange("description", e.target.value)}
                         rows={3}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     />
                 </div>
 
@@ -129,7 +129,7 @@ export function CreateEventForm({
                     </button>
                     <button
                         type="submit"
-                        className="px-4 py-2 text-sm bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
+                        className="px-4 py-2 text-sm bg-primary-600 text-white font-medium rounded-md hover:bg-primary-700 transition-colors"
                     >
                         Create Event
                     </button>

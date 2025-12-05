@@ -7,13 +7,13 @@ interface SelectFieldProps extends React.SelectHTMLAttributes<HTMLSelectElement>
   children: React.ReactNode;
 }
 
-export const SelectField: React.FC<SelectFieldProps> = ({ 
-  label, 
-  error, 
-  helperText, 
-  className = '', 
+export const SelectField: React.FC<SelectFieldProps> = ({
+  label,
+  error,
+  helperText,
+  className = '',
   children,
-  ...props 
+  ...props
 }) => {
   return (
     <div className="w-full">
@@ -24,7 +24,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
       )}
       <select
         {...props}
-        className={`input-field ${error ? 'border-red-500' : ''} ${className}`}
+        className={`select-field ${error ? 'border-red-500' : ''} ${className}`}
       >
         {children}
       </select>

@@ -10,13 +10,13 @@ export function UserList() {
 
   const filteredUsers = users?.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.placeOfResidence.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.phoneNumber.includes(searchTerm);
+      user.placeOfResidence?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.phoneNumber?.includes(searchTerm) || false;
     const matchesGender = !filterGender || user.gender === filterGender;
-    const matchesGuestType = !filterGuestType || 
-                            (filterGuestType === 'first-time' && user.isFirstTimeGuest) ||
-                            (filterGuestType === 'returning' && !user.isFirstTimeGuest);
-    
+    const matchesGuestType = !filterGuestType ||
+      (filterGuestType === 'first-time' && user.isFirstTimeGuest) ||
+      (filterGuestType === 'returning' && !user.isFirstTimeGuest);
+
     return matchesSearch && matchesGender && matchesGuestType;
   });
 
@@ -45,13 +45,13 @@ export function UserList() {
           placeholder="Search attendees..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
         />
-        
+
         <select
           value={filterGender}
           onChange={(e) => setFilterGender(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="select-field"
         >
           <option value="">All Genders</option>
           <option value="male">Male</option>
@@ -62,7 +62,7 @@ export function UserList() {
         <select
           value={filterGuestType}
           onChange={(e) => setFilterGuestType(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="select-field"
         >
           <option value="">All Guest Types</option>
           <option value="first-time">First-time Guests</option>
@@ -118,11 +118,10 @@ export function UserList() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      user.isFirstTimeGuest 
-                        ? 'bg-orange-100 text-orange-800' 
-                        : 'bg-green-100 text-green-800'
-                    }`}>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.isFirstTimeGuest
+                      ? 'bg-orange-100 text-orange-800'
+                      : 'bg-green-100 text-green-800'
+                      }`}>
                       {user.isFirstTimeGuest ? 'First-time' : 'Returning'}
                     </span>
                   </td>
