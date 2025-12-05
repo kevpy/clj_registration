@@ -81,7 +81,7 @@ export function EditAttendeeModal({ isOpen, onClose, attendee }: EditAttendeeMod
                                         required
                                         value={formData.name}
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                                     />
                                 </div>
 
@@ -91,7 +91,7 @@ export function EditAttendeeModal({ isOpen, onClose, attendee }: EditAttendeeMod
                                         type="tel"
                                         value={formData.phoneNumber}
                                         onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                                     />
                                 </div>
 
@@ -101,7 +101,7 @@ export function EditAttendeeModal({ isOpen, onClose, attendee }: EditAttendeeMod
                                         type="text"
                                         value={formData.placeOfResidence}
                                         onChange={(e) => setFormData({ ...formData, placeOfResidence: e.target.value })}
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                                         placeholder=""
                                     />
                                 </div>
@@ -111,7 +111,7 @@ export function EditAttendeeModal({ isOpen, onClose, attendee }: EditAttendeeMod
                                     <select
                                         value={formData.gender}
                                         onChange={(e) => setFormData({ ...formData, gender: e.target.value as any })}
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        className="mt-1 select-field"
                                     >
                                         <option value="male">Male</option>
                                         <option value="female">Female</option>
@@ -125,7 +125,7 @@ export function EditAttendeeModal({ isOpen, onClose, attendee }: EditAttendeeMod
                                         type="checkbox"
                                         checked={formData.isFirstTimeGuest}
                                         onChange={(e) => setFormData({ ...formData, isFirstTimeGuest: e.target.checked })}
-                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                        className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                                     />
                                     <label htmlFor="isFirstTimeGuest" className="ml-2 block text-sm text-gray-900">
                                         First-time Guest
@@ -138,14 +138,14 @@ export function EditAttendeeModal({ isOpen, onClose, attendee }: EditAttendeeMod
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
+                                className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
                             >
                                 {isSubmitting ? "Saving..." : "Save Changes"}
                             </button>
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                             >
                                 Cancel
                             </button>

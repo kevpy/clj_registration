@@ -33,7 +33,7 @@ export function RegistrationForm({
                         type="text"
                         value={formData.name}
                         onChange={(e) => onChange("name", e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                         required
                     />
                 </div>
@@ -46,7 +46,7 @@ export function RegistrationForm({
                         type="text"
                         value={formData.placeOfResidence}
                         onChange={(e) => onChange("placeOfResidence", e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     />
                 </div>
 
@@ -58,7 +58,7 @@ export function RegistrationForm({
                         type="tel"
                         value={formData.phoneNumber}
                         onChange={(e) => onChange("phoneNumber", e.target.value)}
-                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${existingAttendee ? "border-green-300 bg-green-50" : "border-gray-300"
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${existingAttendee ? "border-green-300 bg-green-50" : "border-gray-300"
                             }`}
                     />
                     {existingAttendee && (
@@ -83,7 +83,7 @@ export function RegistrationForm({
                     <select
                         value={formData.gender}
                         onChange={(e) => onChange("gender", e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="select-field"
                         required
                     >
                         <option value="">Select Gender</option>
@@ -100,7 +100,7 @@ export function RegistrationForm({
                         type="email"
                         value={formData.email}
                         onChange={(e) => onChange("email", e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     />
                 </div>
             </div>
@@ -111,7 +111,7 @@ export function RegistrationForm({
                     id="firstTimeGuest"
                     checked={formData.isFirstTimeGuest}
                     onChange={(e) => onChange("isFirstTimeGuest", e.target.checked)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                 />
                 <label htmlFor="firstTimeGuest" className="ml-2 block text-sm text-gray-900">
                     First-time guest (has never attended any event before)

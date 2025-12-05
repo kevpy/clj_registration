@@ -8,11 +8,11 @@ interface JsonPreviewModalProps {
   onConfirm: (mappings: { name: string; phone: string; location: string; isFirstTimeGuest: string }) => void;
 }
 
-export const JsonPreviewModal: React.FC<JsonPreviewModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  jsonData, 
-  onConfirm 
+export const JsonPreviewModal: React.FC<JsonPreviewModalProps> = ({
+  isOpen,
+  onClose,
+  jsonData,
+  onConfirm
 }) => {
   const [mappings, setMappings] = React.useState({
     name: "name",
@@ -20,7 +20,7 @@ export const JsonPreviewModal: React.FC<JsonPreviewModalProps> = ({
     location: "location",
     isFirstTimeGuest: ""
   });
-  
+
   const sampleData = jsonData.slice(0, 5); // Show first 5 rows as sample
   const availableFields = Array.from(
     new Set(jsonData.flatMap((row) => Object.keys(row)))
@@ -38,8 +38,8 @@ export const JsonPreviewModal: React.FC<JsonPreviewModalProps> = ({
           <h4 className="font-medium mb-2">Available Fields</h4>
           <div className="flex flex-wrap gap-2 mb-4">
             {availableFields.map((field) => (
-              <span 
-                key={field} 
+              <span
+                key={field}
                 className="px-2 py-1 bg-gray-100 rounded text-sm"
               >
                 {field}
@@ -53,8 +53,8 @@ export const JsonPreviewModal: React.FC<JsonPreviewModalProps> = ({
             <label className="block text-sm font-medium mb-1">Name Field</label>
             <select
               value={mappings.name}
-              onChange={(e) => setMappings({...mappings, name: e.target.value})}
-              className="w-full p-2 border rounded"
+              onChange={(e) => setMappings({ ...mappings, name: e.target.value })}
+              className="select-field"
             >
               <option value="">Select field...</option>
               {availableFields.map((field) => (
@@ -64,13 +64,13 @@ export const JsonPreviewModal: React.FC<JsonPreviewModalProps> = ({
               ))}
             </select>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium mb-1">Phone Field</label>
             <select
               value={mappings.phone}
-              onChange={(e) => setMappings({...mappings, phone: e.target.value})}
-              className="w-full p-2 border rounded"
+              onChange={(e) => setMappings({ ...mappings, phone: e.target.value })}
+              className="select-field"
             >
               <option value="">Select field...</option>
               {availableFields.map((field) => (
@@ -80,13 +80,13 @@ export const JsonPreviewModal: React.FC<JsonPreviewModalProps> = ({
               ))}
             </select>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium mb-1">Location Field</label>
             <select
               value={mappings.location}
-              onChange={(e) => setMappings({...mappings, location: e.target.value})}
-              className="w-full p-2 border rounded"
+              onChange={(e) => setMappings({ ...mappings, location: e.target.value })}
+              className="select-field"
             >
               <option value="">Select field...</option>
               {availableFields.map((field) => (
@@ -96,13 +96,13 @@ export const JsonPreviewModal: React.FC<JsonPreviewModalProps> = ({
               ))}
             </select>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium mb-1">First-time Guest Field</label>
             <select
               value={mappings.isFirstTimeGuest}
-              onChange={(e) => setMappings({...mappings, isFirstTimeGuest: e.target.value})}
-              className="w-full p-2 border rounded"
+              onChange={(e) => setMappings({ ...mappings, isFirstTimeGuest: e.target.value })}
+              className="select-field"
             >
               <option value="">Default to returnee</option>
               {availableFields.map((field) => (
@@ -136,11 +136,10 @@ export const JsonPreviewModal: React.FC<JsonPreviewModalProps> = ({
           <button
             onClick={handleConfirm}
             disabled={!mappings.name || !mappings.phone}
-            className={`px-4 py-2 rounded ${
-              !mappings.name || !mappings.phone
+            className={`px-4 py-2 rounded ${!mappings.name || !mappings.phone
                 ? "bg-gray-300 cursor-not-allowed"
                 : "bg-primary-600 text-white hover:bg-primary-700"
-            }`}
+              }`}
           >
             Confirm Mappings
           </button>

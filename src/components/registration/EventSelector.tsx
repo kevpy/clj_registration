@@ -17,7 +17,7 @@ export function EventSelector({ events, selectedEventId, onSelect }: EventSelect
             <select
                 value={selectedEventId}
                 onChange={(e) => onSelect(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="select-field"
                 required
             >
                 <option value="">Choose an event...</option>
@@ -32,15 +32,15 @@ export function EventSelector({ events, selectedEventId, onSelect }: EventSelect
             </select>
 
             {selectedEvent && (
-                <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <h4 className="font-medium text-blue-900">{selectedEvent.name}</h4>
-                    <p className="text-sm text-blue-700">
+                <div className="mt-2 p-3 bg-primary-50 border border-primary-200 rounded-lg">
+                    <h4 className="font-medium text-primary-900">{selectedEvent.name}</h4>
+                    <p className="text-sm text-primary-700">
                         {new Date(selectedEvent.date).toLocaleDateString()}
                         {selectedEvent.startTime && ` at ${selectedEvent.startTime}`}
                         {selectedEvent.location && ` • ${selectedEvent.location}`}
                     </p>
                     {selectedEvent.description && (
-                        <p className="text-sm text-blue-600 mt-1">
+                        <p className="text-sm text-primary-600 mt-1">
                             {selectedEvent.description}
                         </p>
                     )}

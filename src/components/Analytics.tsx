@@ -47,7 +47,7 @@ export function Analytics() {
           <select
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(Number(e.target.value))}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="select-field"
           >
             {months.map((month, index) => (
               <option key={month} value={index + 1}>
@@ -59,7 +59,7 @@ export function Analytics() {
           <select
             value={selectedYear}
             onChange={(e) => setSelectedYear(Number(e.target.value))}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="select-field"
           >
             {years.map((year) => (
               <option key={year} value={year}>
@@ -74,7 +74,7 @@ export function Analytics() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-white border rounded-lg p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-2">Events</h3>
-          <p className="text-3xl font-bold text-blue-600">{monthlyStats.totalEvents}</p>
+          <p className="text-3xl font-bold text-primary-600">{monthlyStats.totalEvents}</p>
           <p className="text-sm text-gray-500">This month</p>
         </div>
 
@@ -115,7 +115,7 @@ export function Analytics() {
                     <span className="text-sm text-gray-700">
                       {new Date(date).toLocaleDateString()}
                     </span>
-                    <span className="text-sm font-medium text-blue-600">
+                    <span className="text-sm font-medium text-primary-600">
                       {count} event{count > 1 ? 's' : ''}
                     </span>
                   </div>
@@ -163,7 +163,7 @@ export function Analytics() {
                   <div className="flex items-center">
                     <div className="w-24 bg-gray-200 rounded-full h-2 mr-2">
                       <div
-                        className="bg-blue-500 h-2 rounded-full"
+                        className="bg-primary-500 h-2 rounded-full"
                         style={{
                           width: `${(count as number / monthlyStats.totalRegistrations) * 100}%`,
                         }}
@@ -248,7 +248,7 @@ export function Analytics() {
           <select
             value={selectedEventId}
             onChange={(e) => setSelectedEventId(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="select-field"
           >
             <option value="">Select an event to analyze...</option>
             {events
@@ -271,9 +271,9 @@ export function Analytics() {
           <div className="space-y-6">
             {/* Event Overview */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <p className="text-2xl font-bold text-blue-600">{eventAnalytics.totalRegistrations}</p>
-                <p className="text-sm text-blue-700">Total Registrations</p>
+              <div className="text-center p-4 bg-primary-50 rounded-lg">
+                <p className="text-2xl font-bold text-primary-600">{eventAnalytics.totalRegistrations}</p>
+                <p className="text-sm text-primary-700">Total Registrations</p>
               </div>
               <div className="text-center p-4 bg-green-50 rounded-lg">
                 <p className="text-2xl font-bold text-green-600">{eventAnalytics.attendedCount}</p>
@@ -296,7 +296,7 @@ export function Analytics() {
                       <div className="flex items-center">
                         <div className="w-24 bg-gray-200 rounded-full h-2 mr-2">
                           <div
-                            className="bg-blue-500 h-2 rounded-full"
+                            className="bg-primary-500 h-2 rounded-full"
                             style={{
                               width: `${(count / eventAnalytics.totalRegistrations) * 100}%`,
                             }}
@@ -374,7 +374,7 @@ function ShareReportButton({ eventId }: { eventId: string }) {
         <button
           onClick={handleGenerate}
           disabled={isLoading}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm font-medium"
+          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 text-sm font-medium"
         >
           {isLoading ? "Generating..." : "Share Report"}
         </button>

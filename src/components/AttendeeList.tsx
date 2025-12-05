@@ -93,7 +93,7 @@ export function AttendeeList() {
         <select
           value={selectedEventId}
           onChange={(e) => setSelectedEventId(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="select-field"
         >
           <option value="">All Events / Choose an event...</option>
           {events.map((event) => (
@@ -108,15 +108,15 @@ export function AttendeeList() {
       {selectedEventId && selectedEvent && (
         <>
           {/* Event Info */}
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h3 className="font-semibold text-blue-900">{selectedEvent.name}</h3>
-            <p className="text-blue-700">
+          <div className="mb-6 p-4 bg-primary-50 border border-primary-200 rounded-lg">
+            <h3 className="font-semibold text-primary-900">{selectedEvent.name}</h3>
+            <p className="text-primary-700">
               {new Date(selectedEvent.date).toLocaleDateString()}
               {selectedEvent.startTime && ` at ${selectedEvent.startTime}`}
               {selectedEvent.location && ` • ${selectedEvent.location}`}
             </p>
             <div className="flex gap-4 mt-2 text-sm">
-              <span className="text-blue-600">📝 {selectedEvent.registrationCount} registered</span>
+              <span className="text-primary-600">📝 {selectedEvent.registrationCount} registered</span>
               <span className="text-green-600">✅ {selectedEvent.attendedCount} attended</span>
             </div>
           </div>
@@ -128,13 +128,13 @@ export function AttendeeList() {
               placeholder="Search attendees..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             />
 
             <select
               value={filterGender}
               onChange={(e) => setFilterGender(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="select-field"
             >
               <option value="">All Genders</option>
               <option value="male">Male</option>
@@ -145,7 +145,7 @@ export function AttendeeList() {
             <select
               value={filterGuestType}
               onChange={(e) => setFilterGuestType(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="select-field"
             >
               <option value="">All Guest Types</option>
               <option value="first-time">First-time Guests</option>
@@ -158,7 +158,7 @@ export function AttendeeList() {
                 id="attendedOnly"
                 checked={showAttendedOnly}
                 onChange={(e) => setShowAttendedOnly(e.target.checked)}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
               />
               <label htmlFor="attendedOnly" className="ml-2 text-sm text-gray-700">
                 Attended only
@@ -257,7 +257,7 @@ export function AttendeeList() {
                           ) : (
                             <button
                               onClick={() => handleCheckIn(registration.attendeeId, registration.attendee?.name || "")}
-                              className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                              className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                             >
                               Check In
                             </button>
@@ -266,7 +266,7 @@ export function AttendeeList() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           <button
                             onClick={() => setEditingAttendee(registration.attendee)}
-                            className="text-blue-600 hover:text-blue-900"
+                            className="text-primary-600 hover:text-primary-900"
                           >
                             Edit
                           </button>
@@ -280,7 +280,7 @@ export function AttendeeList() {
                 <div className="p-4 text-center border-t border-gray-200">
                   <button
                     onClick={() => loadMore(10)}
-                    className="px-4 py-2 text-sm text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
+                    className="px-4 py-2 text-sm text-primary-600 bg-primary-50 hover:bg-primary-100 rounded-md transition-colors"
                   >
                     Load More
                   </button>

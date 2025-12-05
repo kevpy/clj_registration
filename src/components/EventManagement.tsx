@@ -91,7 +91,7 @@ export function EventManagement() {
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Event Management</h2>
         <button
           onClick={() => setShowCreateForm(true)}
-          className="px-4 py-2 text-sm bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 text-sm bg-primary-600 text-white font-medium rounded-md hover:bg-primary-700 transition-colors"
         >
           Create New Event
         </button>
@@ -120,7 +120,7 @@ export function EventManagement() {
           <div className="text-gray-500">No events created yet</div>
           <button
             onClick={() => setShowCreateForm(true)}
-            className="mt-4 px-4 py-2 text-sm bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
+            className="mt-4 px-4 py-2 text-sm bg-primary-600 text-white font-medium rounded-md hover:bg-primary-700 transition-colors"
           >
             Create Your First Event
           </button>

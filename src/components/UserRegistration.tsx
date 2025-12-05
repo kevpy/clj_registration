@@ -41,7 +41,7 @@ export function UserRegistration() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.name || !formData.placeOfResidence || !formData.phoneNumber || !formData.gender) {
       toast.error("Please fill in all required fields");
       return;
@@ -91,9 +91,9 @@ export function UserRegistration() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Type name to search..."
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
         />
-        
+
         {searchResults && searchResults.length > 0 && (
           <div className="mt-2 bg-white border border-gray-200 rounded-lg shadow-sm">
             {searchResults.map((user) => (
@@ -124,7 +124,7 @@ export function UserRegistration() {
               type="text"
               value={formData.name}
               onChange={(e) => handleInputChange("name", e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               required
             />
           </div>
@@ -138,7 +138,7 @@ export function UserRegistration() {
               type="text"
               value={formData.placeOfResidence}
               onChange={(e) => handleInputChange("placeOfResidence", e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               required
             />
           </div>
@@ -152,9 +152,8 @@ export function UserRegistration() {
               type="tel"
               value={formData.phoneNumber}
               onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                existingUser ? 'border-red-300 bg-red-50' : 'border-gray-300'
-              }`}
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${existingUser ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                }`}
               required
             />
             {existingUser && (
@@ -172,7 +171,7 @@ export function UserRegistration() {
             <select
               value={formData.gender}
               onChange={(e) => handleInputChange("gender", e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="select-field"
               required
             >
               <option value="">Select Gender</option>
@@ -190,7 +189,7 @@ export function UserRegistration() {
             id="firstTimeGuest"
             checked={formData.isFirstTimeGuest}
             onChange={(e) => handleInputChange("isFirstTimeGuest", e.target.checked)}
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
           />
           <label htmlFor="firstTimeGuest" className="ml-2 block text-sm text-gray-900">
             First-time guest
@@ -202,7 +201,7 @@ export function UserRegistration() {
           <button
             type="submit"
             disabled={isSubmitting || !!existingUser}
-            className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-6 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {isSubmitting ? "Registering..." : "Register User"}
           </button>

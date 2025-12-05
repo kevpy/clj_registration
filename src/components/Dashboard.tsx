@@ -25,7 +25,7 @@ export function Dashboard() {
       value: stats.totalEvents,
       subtitle: `${stats.activeEvents} active`,
       icon: "🎉",
-      color: "bg-blue-500",
+      color: "bg-primary-500",
     },
     {
       title: "Total Attendees",
@@ -53,7 +53,7 @@ export function Dashboard() {
   return (
     <div className="p-6">
       <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">Dashboard Overview</h2>
-      
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {statCards.map((stat, index) => (
@@ -93,7 +93,7 @@ export function Dashboard() {
                     )}
                   </div>
                   <div className="text-right">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
                       {event.date === new Date().toISOString().split('T')[0] ? 'Today' : 'Upcoming'}
                     </span>
                   </div>
@@ -116,7 +116,7 @@ export function Dashboard() {
                   <div className="flex items-center">
                     <div className="w-32 bg-gray-200 rounded-full h-2 mr-3">
                       <div
-                        className="bg-blue-500 h-2 rounded-full"
+                        className="bg-primary-500 h-2 rounded-full"
                         style={{
                           width: `${(count / stats.totalAttendees) * 100}%`,
                         }}
