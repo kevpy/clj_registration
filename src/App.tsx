@@ -9,6 +9,7 @@ import RegistrationPage from "./pages/RegistrationPage";
 import AttendeesPage from "./pages/AttendeesPage";
 import ExcelUploadPage from "./pages/ExcelUploadPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
+import TestimoniesPage from "./pages/TestimoniesPage";
 
 import SharedReportPage from "./pages/SharedReportPage";
 
@@ -45,6 +46,7 @@ function MainApp() {
             <Route path="/attendees" element={<AttendeesPage />} />
             <Route path="/excel" element={<ExcelUploadPage />} />
             <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route path="/testimonies" element={<TestimoniesPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </DashboardLayout>
