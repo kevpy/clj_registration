@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -26,9 +25,8 @@ export default function TestimoniesPage() {
     const isAdmin = loggedInUser?.role === "admin";
 
     const handleDelete = async (id: Id<"testimonies">) => {
-        if (confirm("Are you sure you want to delete this testimony?")) {
-            await deleteTestimony({ testimonyId: id });
-        }
+        await deleteTestimony({ testimonyId: id });
+        setIsModalOpen(false); // Close modal after delete
     };
 
     const handleViewDetails = (testimony: any) => {
@@ -201,14 +199,6 @@ export default function TestimoniesPage() {
                                         >
                                             View Details
                                         </button>
-                                        {isAdmin && (
-                                            <button
-                                                onClick={() => handleDelete(testimony._id)}
-                                                className="text-xs font-medium text-red-600 hover:text-red-700 hover:underline ml-2"
-                                            >
-                                                Delete
-                                            </button>
-                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -229,6 +219,8 @@ export default function TestimoniesPage() {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 testimony={selectedTestimony}
+                onDelete={handleDelete}
+                canDelete={isAdmin}
             />
         </div>
     );

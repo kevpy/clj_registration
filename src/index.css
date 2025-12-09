@@ -75,3 +75,29 @@ body {
 .table td {
   @apply px-4 py-3 whitespace-nowrap text-sm text-gray-900;
 }
+
+@media print {
+  body>*:not(#print-container) {
+    display: none !important;
+  }
+
+  #print-container {
+    display: block !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+    z-index: 9999;
+  }
+
+  /* Ensure the content inside print container is visible and styled correctly */
+  #print-container * {
+    visibility: visible;
+  }
+
+  /* Hide scrollbars when printing */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+}
