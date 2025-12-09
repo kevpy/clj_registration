@@ -1,13 +1,21 @@
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
 export default function SharedReportPage() {
     const { token } = useParams<{ token: string }>();
+    const [isPhoneMasked, setIsPhoneMasked] = useState(true);
 
     const report = useQuery(api.reports.getSharedReport,
         token ? { token } : "skip"
     );
+
+    const maskPhoneNumber = (phone: string) => {
+        if (!phone) return "";
+        if (phone.length < 6) return phone; // Too short to mask effectively
+        return `${phone.slice(0, 4)} **** ${phone.slice(-3)}`;
+    };
 
     if (!token) {
         return <div className="p-8 text-center text-red-600">Invalid link</div>;
@@ -50,12 +58,20 @@ export default function SharedReportPage() {
                                 })}
                             </p>
                         </div>
-                        <button
-                            onClick={() => window.print()}
-                            className="bg-white text-primary px-4 py-2 rounded-lg font-medium hover:bg-primary-50 transition-colors print:hidden"
-                        >
-                            Print / Save PDF
-                        </button>
+                        <div className="flex gap-2 print:hidden">
+                            <button
+                                onClick={() => setIsPhoneMasked(!isPhoneMasked)}
+                                className="bg-white/20 text-white px-4 py-2 rounded-lg font-medium hover:bg-white/30 transition-colors backdrop-blur-sm"
+                            >
+                                {isPhoneMasked ? "Show Phone Nos." : "Hide Phone Nos."}
+                            </button>
+                            <button
+                                onClick={() => window.print()}
+                                className="bg-white text-primary px-4 py-2 rounded-lg font-medium hover:bg-primary-50 transition-colors"
+                            >
+                                Print / Save PDF
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -86,7 +102,9 @@ export default function SharedReportPage() {
                                         {report.firstTimeGuests.map((guest, idx) => (
                                             <tr key={idx} className="border-b border-gray-50 hover:bg-gray-50">
                                                 <td className="py-3 px-4 text-gray-800">{guest.name}</td>
-                                                <td className="py-3 px-4 text-gray-600 font-mono text-sm">{guest.phone}</td>
+                                                <td className="py-3 px-4 text-gray-600 font-mono text-sm">
+                                                    {isPhoneMasked ? maskPhoneNumber(guest.phone) : guest.phone}
+                                                </td>
                                                 <td className="py-3 px-4 text-gray-600">{guest.residence}</td>
                                             </tr>
                                         ))}
@@ -124,7 +142,9 @@ export default function SharedReportPage() {
                                         {report.returningGuests.map((guest, idx) => (
                                             <tr key={idx} className="border-b border-gray-50 hover:bg-gray-50">
                                                 <td className="py-3 px-4 text-gray-800">{guest.name}</td>
-                                                <td className="py-3 px-4 text-gray-600 font-mono text-sm">{guest.phone}</td>
+                                                <td className="py-3 px-4 text-gray-600 font-mono text-sm">
+                                                    {isPhoneMasked ? maskPhoneNumber(guest.phone) : guest.phone}
+                                                </td>
                                                 <td className="py-3 px-4 text-gray-600">{guest.residence}</td>
                                             </tr>
                                         ))}

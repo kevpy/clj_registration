@@ -113,7 +113,7 @@ export const getSharedReport = query({
             .filter((a) => a.isFirstTimeGuest)
             .map((a) => ({
                 name: a.name!,
-                phone: maskPhoneNumber(a.phoneNumber),
+                phone: a.phoneNumber || "-",
                 residence: a.placeOfResidence || "-",
             }));
 
@@ -121,7 +121,7 @@ export const getSharedReport = query({
             .filter((a) => !a.isFirstTimeGuest)
             .map((a) => ({
                 name: a.name!,
-                phone: maskPhoneNumber(a.phoneNumber),
+                phone: a.phoneNumber || "-",
                 residence: a.placeOfResidence || "-",
             }));
 
