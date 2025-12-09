@@ -86,9 +86,7 @@ export function TestimonyForm({ onSuccess }: { onSuccess?: () => void }) {
     };
 
     return (
-        <div className="card p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6 border-b border-gray-100 pb-4">Submit New Testimony</h3>
-
+        <div className="h-full">
             {error && (
                 <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm flex items-center">
                     <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -172,11 +170,11 @@ export function TestimonyForm({ onSuccess }: { onSuccess?: () => void }) {
                     <label className="block text-sm font-medium text-gray-700 mb-3">
                         What kind of testimony do you have? (Tick as appropriate) <span className="text-red-500">*</span>
                     </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                         {TESTIMONY_CATEGORIES.map((category) => (
                             <label key={category} className={`flex items-center space-x-3 p-3 border rounded-lg cursor-pointer transition-all duration-200 ${formData.categories.includes(category)
-                                    ? "bg-primary-50 border-primary-500 ring-1 ring-primary-500"
-                                    : "border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+                                ? "bg-primary-50 border-primary-500 ring-1 ring-primary-500"
+                                : "border-gray-200 hover:bg-gray-50 hover:border-gray-300"
                                 }`}>
                                 <input
                                     type="checkbox"
