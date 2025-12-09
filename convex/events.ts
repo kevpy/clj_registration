@@ -146,19 +146,19 @@ export const updateEvent = mutation({
 });
 
 export const getUpcomingEvents = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { currentDate: v.optional(v.string()) },
+  handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
       throw new Error("Not authenticated");
     }
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = args.currentDate || new Date().toISOString().split('T')[0];
 
     const events = await ctx.db
       .query("events")
-      .withIndex("by_active", (q) => q.eq("isActive", true))
-      .filter((q) => q.gte(q.field("date"), today))
+      .withIndex("by_date_and_active", (q) => q.gte("date", today))
+      .filter((q) => q.eq(q.field("isActive"), true))
       .take(10);
 
     return events;

@@ -3,7 +3,15 @@ import { api } from "../../convex/_generated/api";
 
 export function Dashboard() {
   const stats = useQuery(api.analytics.getDashboardStats);
-  const upcomingEvents = useQuery(api.events.getUpcomingEvents);
+
+  // Get local date in YYYY-MM-DD format
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const today = `${year}-${month}-${day}`;
+
+  const upcomingEvents = useQuery(api.events.getUpcomingEvents, { currentDate: today });
 
   if (!stats || !upcomingEvents) {
     return (
@@ -75,7 +83,7 @@ export function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Upcoming Events */}
         <div className="bg-white border rounded-lg p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Upcoming Events</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Current / Upcoming Events</h3>
           {upcomingEvents.length === 0 ? (
             <p className="text-gray-500 text-center py-8">No upcoming events</p>
           ) : (
@@ -94,7 +102,7 @@ export function Dashboard() {
                   </div>
                   <div className="text-right">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
-                      {event.date === new Date().toISOString().split('T')[0] ? 'Today' : 'Upcoming'}
+                      {event.date === today ? 'Today' : 'Upcoming'}
                     </span>
                   </div>
                 </div>
