@@ -77,11 +77,11 @@ body {
 }
 
 @media print {
-  body>*:not(#print-container) {
+  body.print-mode-modal>*:not(#print-container) {
     display: none !important;
   }
 
-  #print-container {
+  body.print-mode-modal #print-container {
     display: block !important;
     position: absolute;
     top: 0;
