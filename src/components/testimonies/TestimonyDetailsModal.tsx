@@ -24,7 +24,14 @@ export function TestimonyDetailsModal({ isOpen, onClose, testimony, onDelete, ca
         }
 
         printContainer.innerHTML = content.innerHTML;
+
+        // Add class to body to trigger print styles
+        document.body.classList.add('print-mode-modal');
+
         window.print();
+
+        // Remove class after print
+        document.body.classList.remove('print-mode-modal');
 
         // Optional: Clear after print to avoid stale content if inspecting
         // printContainer.innerHTML = ''; 
