@@ -20,6 +20,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         { id: "attendees", label: "All Attendees", icon: "👥", path: "/attendees" },
         { id: "excel", label: "Excel Upload", icon: "📄", path: "/excel" },
         { id: "analytics", label: "Analytics", icon: "📈", path: "/analytics" },
+        { id: "testimonies", label: "Testimonies", icon: "🙏", path: "/testimonies" },
     ];
 
     const currentTab = navigationTabs.find((tab) => tab.path === location.pathname) || navigationTabs[0];

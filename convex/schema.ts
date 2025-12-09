@@ -52,6 +52,21 @@ const applicationTables = {
     .index("by_registration_date", ["registrationDate"])
     .index("by_event_and_attendance", ["eventId", "hasAttended"]),
 
+  // Testimonies submitted by users
+  testimonies: defineTable({
+    eventId: v.optional(v.id("events")), // Optional association with an event
+    name: v.string(),
+    phoneNumber: v.optional(v.string()),
+    date: v.string(), // YYYY-MM-DD format
+    categories: v.array(v.string()), // Array of selected testimony categories
+    otherTestimony: v.optional(v.string()), // Free-text for "Any other testimony?"
+    createdBy: v.id("users"), // Auth user who submitted
+    createdAt: v.number(), // Timestamp
+  })
+    .index("by_event", ["eventId"])
+    .index("by_date", ["date"])
+    .index("by_created_at", ["createdAt"]),
+
   // Shareable links for reports
   shareableLinks: defineTable({
     token: v.string(),
