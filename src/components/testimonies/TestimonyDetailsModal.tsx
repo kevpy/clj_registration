@@ -33,8 +33,10 @@ export function TestimonyDetailsModal({ isOpen, onClose, testimony, onDelete, ca
         // Remove class after print
         document.body.classList.remove('print-mode-modal');
 
-        // Optional: Clear after print to avoid stale content if inspecting
-        // printContainer.innerHTML = ''; 
+        // Remove the print container to clean up
+        if (printContainer && printContainer.parentNode) {
+            printContainer.parentNode.removeChild(printContainer);
+        }
     };
 
     const handleDeleteClick = () => {

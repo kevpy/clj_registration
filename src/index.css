@@ -81,6 +81,11 @@ body {
     display: none !important;
   }
 
+  /* Hide print container by default */
+  #print-container {
+    display: none;
+  }
+
   body.print-mode-modal #print-container {
     display: block !important;
     position: absolute;
